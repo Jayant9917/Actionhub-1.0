@@ -24,6 +24,16 @@ export default function CreateAutomationPage() {
   useToastFeedback(error);
   async function publish() {
     setError("");
+    if (
+      trigger === "schedule" &&
+      schedule.frequency === "custom_interval" &&
+      (!Number.isInteger(schedule.intervalMinutes) ||
+        schedule.intervalMinutes < 1 ||
+        schedule.intervalMinutes > 1440)
+    ) {
+      setError("Enter a whole-number interval from 1 to 1440 minutes.");
+      return;
+    }
     setSaving(true);
     try {
       const { data } = await axios.post(

@@ -26,11 +26,12 @@ export async function dispatchSchedules(
           workflowId: timer.workflowId,
           enabled: true,
           frequency: timer.frequency,
+          intervalMinutes: timer.intervalMinutes,
           hour: timer.hour,
           minute: timer.minute,
           nextRunAt: timer.nextRunAt,
         },
-        data: { nextRunAt: nextSchedule(timer, now) },
+        data: { nextRunAt: nextSchedule(timer, now, timer.nextRunAt) },
       });
       if (!claim.count) return; // Another processor or a settings change already took this slot.
       const actions = await tx.action.findMany({
@@ -47,6 +48,14 @@ export async function dispatchSchedules(
               firedAt: now.toISOString(),
               frequency: timer.frequency,
               timezone: "UTC",
+              intervalMinutes:
+                timer.frequency === "every_5_minutes"
+                  ? 5
+                  : timer.frequency === "every_10_minutes"
+                    ? 10
+                    : timer.frequency === "custom_interval"
+                      ? timer.intervalMinutes
+                      : 1440,
             },
           },
           actionRuns: {

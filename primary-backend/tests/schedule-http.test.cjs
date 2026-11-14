@@ -177,3 +177,18 @@ test("publishing a schedule without timing settings is rejected", async () => {
   expect(res.status).toHaveBeenCalledWith(400);
   expect(db.$transaction).not.toHaveBeenCalled();
 });
+
+test.each([1, 12, 1440])("accepts custom interval %s", (intervalMinutes) =>
+  expect(ScheduleSchema.safeParse({ frequency: "custom_interval", intervalMinutes }).success).toBe(
+    true,
+  ),
+);
+test.each([0, -1, 1.5, 1441, null])("rejects invalid interval %s", (intervalMinutes) =>
+  expect(ScheduleSchema.safeParse({ frequency: "custom_interval", intervalMinutes }).success).toBe(
+    false,
+  ),
+);
+test("supports ten-minute scheduling and preserves old five-minute settings", () => {
+  expect(ScheduleSchema.safeParse({ frequency: "every_10_minutes" }).success).toBe(true);
+  expect(ScheduleSchema.parse({ frequency: "every_5_minutes" }).intervalMinutes).toBe(5);
+});

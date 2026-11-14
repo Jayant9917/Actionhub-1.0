@@ -20,6 +20,7 @@ export const providers: Record<string, string> = {
   "google_sheets.append_row": "google.service_account",
 };
 export const eventFields = [
+  "schedule.intervalMinutes",
   "schedule.scheduledAt",
   "schedule.firedAt",
   "schedule.frequency",
@@ -50,6 +51,7 @@ export const eventFields = [
   "execution.actionId",
 ];
 export const fieldLabels: Record<string, string> = {
+  "schedule.intervalMinutes": "Interval in minutes",
   "schedule.scheduledAt": "Scheduled time",
   "schedule.firedAt": "Started time",
   "schedule.frequency": "Schedule frequency",

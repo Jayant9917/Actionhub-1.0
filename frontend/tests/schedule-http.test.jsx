@@ -78,3 +78,42 @@ test("inserting an HTTP event field keeps its request body valid JSON", () => {
     schedule_scheduledAt: "{{schedule.scheduledAt}}",
   });
 });
+
+test("offers ten minutes and lets the user enter a twelve-minute interval", () => {
+  render(<Schedule />);
+  fireEvent.change(screen.getByLabelText("Schedule frequency"), {
+    target: { value: "every_10_minutes" },
+  });
+  expect(screen.getByLabelText("Schedule frequency")).toHaveValue("every_10_minutes");
+  fireEvent.change(screen.getByLabelText("Schedule frequency"), {
+    target: { value: "custom_interval" },
+  });
+  fireEvent.change(screen.getByLabelText("Interval (minutes)"), { target: { value: "12" } });
+  expect(screen.getByLabelText("Interval (minutes)")).toHaveValue(12);
+  fireEvent.change(screen.getByLabelText("Interval (minutes)"), { target: { value: "" } });
+  expect(screen.getByLabelText("Interval (minutes)")).toHaveValue(null);
+});
+test("loads and saves an existing custom interval", async () => {
+  axios.get.mockResolvedValue({
+    data: {
+      schedule: {
+        ...initialSchedule,
+        frequency: "custom_interval",
+        intervalMinutes: 12,
+        nextRunAt: "2026-11-15T09:00:00Z",
+      },
+    },
+  });
+  axios.put.mockResolvedValue({ data: { schedule: { nextRunAt: "2026-11-16T09:00:00Z" } } });
+  render(<ScheduleSetup workflowId="workflow" />);
+  expect(await screen.findByLabelText("Interval (minutes)")).toHaveValue(12);
+  fireEvent.change(screen.getByLabelText("Interval (minutes)"), { target: { value: "15" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save schedule" }));
+  await waitFor(() =>
+    expect(axios.put).toHaveBeenCalledWith(
+      "/api/v1/zap/workflow/schedule",
+      { ...initialSchedule, frequency: "custom_interval", intervalMinutes: 15 },
+      expect.any(Object),
+    ),
+  );
+});

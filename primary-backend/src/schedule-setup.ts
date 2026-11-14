@@ -4,7 +4,8 @@ import type { PrismaClient } from "./generated/prisma-new/client.js";
 import { nextSchedule } from "./schedule-time.js";
 export const ScheduleSchema = z
   .object({
-    frequency: z.enum(["every_5_minutes", "daily"]),
+    frequency: z.enum(["every_5_minutes", "every_10_minutes", "custom_interval", "daily"]),
+    intervalMinutes: z.number().int().min(1).max(1440).default(5),
     hour: z.number().int().min(0).max(23).default(9),
     minute: z.number().int().min(0).max(59).default(0),
     enabled: z.boolean().default(true),
@@ -29,9 +30,10 @@ export function createScheduleHandlers(db: Pick<PrismaClient, "$transaction" | "
     async save(req: Request, res: Response) {
       const parsed = ScheduleSchema.safeParse(req.body);
       if (!parsed.success)
-        return res
-          .status(400)
-          .json({ message: "Choose every five minutes or daily, with a valid UTC time." });
+        return res.status(400).json({
+          message:
+            "Choose a schedule and a whole-number interval from 1 to 1440 minutes, or a valid daily UTC time.",
+        });
       try {
         const schedule = await db.$transaction(async (tx) => {
           const owned = await tx.zap.updateMany({

@@ -199,6 +199,7 @@ model TallyDelivery {
 model ScheduleTrigger {
   workflowId String @id
   frequency String
+  intervalMinutes Int @default(5)
   hour Int @default(9)
   minute Int @default(0)
   enabled Boolean @default(true)

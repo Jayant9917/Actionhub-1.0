@@ -55,7 +55,7 @@ const triggers = [
     name: "Schedule",
     event: "Recurring schedule",
     image: "/schedule.svg",
-    description: "Run every five minutes or daily at a chosen UTC time.",
+    description: "Run every 5 or 10 minutes, at a custom interval, or daily.",
   },
   {
     id: "tally.form_submitted",

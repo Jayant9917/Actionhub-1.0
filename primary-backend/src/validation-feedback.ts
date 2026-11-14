@@ -11,6 +11,7 @@ const fields: Record<string, string> = {
   url: "HTTPS URL",
   method: "HTTP method",
   frequency: "Schedule frequency",
+  intervalMinutes: "Interval in minutes",
   hour: "UTC hour",
   minute: "UTC minute",
   email: "Recipient",

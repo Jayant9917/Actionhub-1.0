@@ -70,3 +70,53 @@ test.each([
   await dispatchSchedules(db, now);
   expect(tx.zapRun.create).not.toHaveBeenCalled();
 });
+
+test("ten-minute preset uses the next clock boundary", () => {
+  expect(nextSchedule({ frequency: "every_10_minutes" }, now).toISOString()).toBe(
+    "2026-11-14T09:10:00.000Z",
+  );
+  expect(
+    nextSchedule({ frequency: "every_10_minutes" }, new Date("2026-11-14T09:10:00Z")).toISOString(),
+  ).toBe("2026-11-14T09:20:00.000Z");
+});
+test("custom intervals start after saving and retain their cadence after downtime", () => {
+  const settings = { frequency: "custom_interval", intervalMinutes: 12 };
+  expect(nextSchedule(settings, now).toISOString()).toBe("2026-11-14T09:17:30.000Z");
+  expect(
+    nextSchedule(
+      settings,
+      new Date("2026-11-14T10:00:00Z"),
+      new Date("2026-11-14T09:17:30Z"),
+    ).toISOString(),
+  ).toBe("2026-11-14T10:05:30.000Z");
+});
+test.each([0, -1, 1.5, 1441, undefined])("rejects invalid custom interval %s", (intervalMinutes) =>
+  expect(() => nextSchedule({ frequency: "custom_interval", intervalMinutes }, now)).toThrow(
+    "INVALID_INTERVAL",
+  ),
+);
+test.each([1, 1440])("accepts custom interval boundary %s", (intervalMinutes) =>
+  expect(
+    nextSchedule({ frequency: "custom_interval", intervalMinutes }, now).getTime() - now.getTime(),
+  ).toBe(intervalMinutes * 60000),
+);
+
+test("dispatches a custom timer once and preserves its twelve-minute cadence", async () => {
+  const { db, tx } = database();
+  db.scheduleTrigger.findMany.mockResolvedValue([
+    {
+      workflowId: "workflow",
+      frequency: "custom_interval",
+      intervalMinutes: 12,
+      hour: 9,
+      minute: 0,
+      nextRunAt: new Date("2026-11-14T08:53:00Z"),
+    },
+  ]);
+  await dispatchSchedules(db, now);
+  expect(tx.scheduleTrigger.updateMany.mock.calls[0][0]).toMatchObject({
+    where: { intervalMinutes: 12 },
+    data: { nextRunAt: new Date("2026-11-14T09:17:00Z") },
+  });
+  expect(tx.zapRun.create.mock.calls[0][0].data.metadata.schedule.intervalMinutes).toBe(12);
+});
