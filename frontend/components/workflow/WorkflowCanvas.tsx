@@ -288,9 +288,6 @@ export function WorkflowCanvas({
                         {item.description}
                       </span>
                     </span>
-                    <span aria-hidden="true" className="ml-auto text-neutral-400">
-                      ?
-                    </span>
                   </button>
                 ))}
             </div>
