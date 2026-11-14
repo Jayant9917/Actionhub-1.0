@@ -101,3 +101,17 @@ test("Resend alternative implicit TLS port uses a secure transport", () => {
   process.env.SMTP_PORT = "2465";
   expect(load().config.smtp.secure).toBe(true);
 });
+
+test("WORKER_CONCURRENCY retains its default and accepts a configured value", () => {
+  expect(load().config.concurrency).toBe(1);
+  jest.resetModules();
+  process.env.WORKER_CONCURRENCY = "2";
+  expect(load().config.concurrency).toBe(2);
+});
+test.each(["", "0", "-1", "1.5", "257", "abc"])(
+  "rejects invalid WORKER_CONCURRENCY %s",
+  (value) => {
+    process.env.WORKER_CONCURRENCY = value;
+    expect(load).toThrow(/WORKER_CONCURRENCY/);
+  },
+);

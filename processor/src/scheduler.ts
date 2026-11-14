@@ -3,6 +3,7 @@ import { nextSchedule } from "./schedule-time.js";
 export async function dispatchSchedules(
   db: Pick<PrismaClient, "scheduleTrigger" | "$transaction">,
   now = new Date(),
+  batchSize = 50,
 ) {
   const due = await db.scheduleTrigger.findMany({
     where: {
@@ -11,7 +12,7 @@ export async function dispatchSchedules(
       workflow: { deletedAt: null, trigger: { triggerId: "schedule" } },
     },
     orderBy: { nextRunAt: "asc" },
-    take: 50,
+    take: batchSize,
   });
   for (const timer of due) {
     await db.$transaction(async (tx) => {

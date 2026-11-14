@@ -41,8 +41,20 @@ function setting(name: string, fallback: string): string {
   return required(name).trim();
 }
 
+function integerSetting(name: string, fallback: number, maximum: number, minimum = 1): number {
+  const raw = process.env[name];
+  if (raw === undefined) return fallback;
+  const value = Number(raw);
+  if (!/^\d+$/.test(raw) || !Number.isSafeInteger(value) || value < minimum || value > maximum)
+    throw new Error(`Invalid ${name}: expected an integer from ${minimum} to ${maximum}`);
+  return value;
+}
+
 export const config = {
   databaseUrl: databaseUrl(),
   brokers: brokers(),
+  batchSize: integerSetting("PROCESSOR_BATCH_SIZE", 50, 1000),
+  pollIntervalMs: integerSetting("PROCESSOR_POLL_INTERVAL_MS", 2000, 60000, 100),
+  scheduleBatchSize: integerSetting("SCHEDULER_BATCH_SIZE", 50, 500),
   topic: setting("KAFKA_TOPIC", "zap-events"),
 };

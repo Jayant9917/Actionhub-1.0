@@ -12,17 +12,22 @@ async function main() {
   await producer.connect();
   while (true) {
     try {
-      await dispatchSchedules(prisma);
-      await dispatchActions(prisma, async (job) => {
-        await producer.send({
-          topic: config.topic,
-          messages: [{ key: job.actionExecutionId, value: JSON.stringify(job) }],
-        });
-      });
+      await dispatchSchedules(prisma, new Date(), config.scheduleBatchSize);
+      await dispatchActions(
+        prisma,
+        async (job) => {
+          await producer.send({
+            topic: config.topic,
+            messages: [{ key: job.actionExecutionId, value: JSON.stringify(job) }],
+          });
+        },
+        new Date(),
+        config.batchSize,
+      );
     } catch {
       console.error("Dispatch cycle failed; pending work will be retried");
     }
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, config.pollIntervalMs));
   }
 }
 

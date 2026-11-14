@@ -47,11 +47,21 @@ function boolean(name: string, fallback: boolean): boolean {
 
 const smtpPort = port("SMTP_PORT", 587);
 const smtpAuth = boolean("SMTP_AUTH", true);
+function integerSetting(name: string, fallback: number, maximum: number, minimum = 1): number {
+  const raw = process.env[name];
+  if (raw === undefined) return fallback;
+  const value = Number(raw);
+  if (!/^\d+$/.test(raw) || !Number.isSafeInteger(value) || value < minimum || value > maximum)
+    throw new Error(`Invalid ${name}: expected an integer from ${minimum} to ${maximum}`);
+  return value;
+}
+
 export const config = {
   databaseUrl: required("DATABASE_URL"),
   encryptionKey: readEncryptionKey(process.env.CREDENTIAL_ENCRYPTION_KEY),
   brokers: brokers(),
   topic: setting("KAFKA_TOPIC", "zap-events"),
+  concurrency: integerSetting("WORKER_CONCURRENCY", 1, 256),
   groupId: setting("KAFKA_GROUP_ID", "main-worker"),
   smtp: {
     host: required("SMTP_ENDPOINT").trim(),

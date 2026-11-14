@@ -62,26 +62,19 @@ services:
       retries: 30
       start_period: 15s
 
-  # One-time task: create the zap-events topic if it does not exist.
+  # One-time task: create the topic or increase its partitions to match .env.docker.
   kafka-init:
     image: apache/kafka:3.9.1
     depends_on:
       kafka:
         condition: service_healthy
-    entrypoint: [/opt/kafka/bin/kafka-topics.sh]
-    command:
-      [
-        --bootstrap-server,
-        "kafka:9092",
-        --create,
-        --if-not-exists,
-        --topic,
-        zap-events,
-        --partitions,
-        "1",
-        --replication-factor,
-        "1",
-      ]
+    environment:
+      KAFKA_PARTITIONS: ${KAFKA_PARTITIONS:-1}
+      KAFKA_TOPIC: zap-events
+      KAFKA_BROKERS: kafka:9092
+    volumes:
+      - ./processor/scripts/init-kafka.sh:/opt/actionhub/init-kafka.sh:ro
+    entrypoint: [sh, /opt/actionhub/init-kafka.sh]
 
   # One-time task: apply database migrations and seed the initial trigger/action types.
   db-init:
@@ -230,6 +223,7 @@ services:
 
   # Reads pending database events and publishes messages to Kafka.
   processor:
+    scale: ${PROCESSOR_REPLICAS:-1}
     restart: unless-stopped
     image: actionhub-processor-dev
     build:
@@ -240,6 +234,9 @@ services:
       DATABASE_URL: postgresql://actionhub:actionhub_dev@postgres:5432/actionhub
       KAFKA_BROKERS: kafka:9092
       KAFKA_TOPIC: zap-events
+      PROCESSOR_BATCH_SIZE: ${PROCESSOR_BATCH_SIZE:-50}
+      PROCESSOR_POLL_INTERVAL_MS: ${PROCESSOR_POLL_INTERVAL_MS:-2000}
+      SCHEDULER_BATCH_SIZE: ${SCHEDULER_BATCH_SIZE:-50}
     depends_on:
       db-init:
         condition: service_completed_successfully
@@ -287,6 +284,7 @@ services:
 
   # Consumes Kafka messages and sends email through Resend SMTP.
   worker:
+    scale: ${WORKER_REPLICAS:-1}
     restart: unless-stopped
     image: actionhub-worker-dev
     build:
@@ -299,6 +297,7 @@ services:
       KAFKA_BROKERS: kafka:9092
       KAFKA_TOPIC: zap-events
       KAFKA_GROUP_ID: main-worker
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-1}
       SMTP_ENDPOINT: ${SMTP_ENDPOINT:-smtp.resend.com}
       SMTP_PORT: ${SMTP_PORT:-465}
       SMTP_AUTH: "true"

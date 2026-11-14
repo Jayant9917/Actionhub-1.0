@@ -25,6 +25,7 @@ async function main() {
   await consumer.subscribe({ topic: config.topic, fromBeginning: true });
   await consumer.run({
     autoCommit: false,
+    partitionsConsumedConcurrently: config.concurrency,
     eachMessage: (input) =>
       handleMessage(
         prisma,

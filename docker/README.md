@@ -65,3 +65,49 @@ docker compose --env-file .env.docker down
 ```
 
 Ordinary down preserves named data volumes. Do not add -v unless deliberately deleting data. This development configuration still uses HTTP, a development frontend and a single Kafka broker; production hardening and EC2/CD are separate work.
+
+## Scaling from .env.docker
+
+The root .env.docker is the control file for Docker Desktop. Service .env files are not required: Compose injects the relevant values into every replica.
+
+| Variable                   | Default | Meaning                                                         |
+| -------------------------- | ------- | --------------------------------------------------------------- |
+| KAFKA_PARTITIONS           | 1       | Partitions for zap-events; 1-256; existing topics can only grow |
+| WORKER_REPLICAS            | 1       | Number of worker containers sharing main-worker                 |
+| WORKER_CONCURRENCY         | 1       | Partitions processed concurrently inside each worker; 1-256     |
+| PROCESSOR_REPLICAS         | 1       | Number of processors; start with one                            |
+| PROCESSOR_BATCH_SIZE       | 50      | Maximum actions selected for dispatch per cycle; 1-1000         |
+| PROCESSOR_POLL_INTERVAL_MS | 2000    | Pause after a processor cycle; 100-60000 milliseconds           |
+| SCHEDULER_BATCH_SIZE       | 50      | Maximum due schedules selected per cycle; 1-500                 |
+
+Example for three workers:
+
+```env
+KAFKA_PARTITIONS=3
+WORKER_REPLICAS=3
+WORKER_CONCURRENCY=1
+PROCESSOR_REPLICAS=1
+PROCESSOR_BATCH_SIZE=50
+PROCESSOR_POLL_INTERVAL_MS=2000
+SCHEDULER_BATCH_SIZE=50
+```
+
+After editing the file, with Kafka already running, apply the partition setting first:
+
+```powershell
+docker compose --env-file .env.docker run --rm --no-deps kafka-init
+```
+
+Only if that succeeds, apply replica counts and runtime settings:
+
+```powershell
+docker compose --env-file .env.docker up -d --no-build --no-deps worker processor
+```
+
+These commands reuse existing images and do not rebuild or restart PostgreSQL, Kafka, the API, hooks or frontend. The init script creates a missing topic or increases an existing one. A lower count exits with an error and never deletes the topic. Increasing partitions is persistent and may change where new keyed messages are routed. Setting KAFKA_PARTITIONS back to 1 after increasing it to 3 is not supported; keep the real count or higher. You can reduce WORKER_REPLICAS independently.
+
+For a stopped or first-time stack, use the normal full `docker compose --env-file .env.docker up -d` (add --build only for the first image build or source/dependency changes). Full up also applies the environment controls and runs kafka-init before processor/worker startup. Changing the file alone or running compose restart does not apply environment changes.
+
+One partition can feed only one consumer in the shared group. For example, three partitions plus three workers with concurrency one can use all three workers; three partitions plus one worker with concurrency three can instead run those partitions concurrently in one container. More concurrency than available partitions does not add parallelism. Keep the group ID unchanged; different groups each consume the stream independently.
+
+Only partitions/replicas/tuning are configurable here. Kafka topic and worker group stay fixed to avoid accidentally switching streams or replaying work. Kafka replication factor stays one because this stack has one broker. More partitions do not provide broker fault tolerance. Replica changes are manual, not automatic traffic-based scaling. Watch consumer lag, action delay, provider limits, database connections, CPU and RAM before increasing values. Multiple processors use database claims but may contend for the same rows, so throughput does not necessarily increase linearly.

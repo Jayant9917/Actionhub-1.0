@@ -55,3 +55,45 @@ test("rejects a blank topic", () => {
   process.env.KAFKA_TOPIC = " ";
   expect(load).toThrow(/KAFKA_TOPIC/);
 });
+
+test("PROCESSOR_BATCH_SIZE retains its default and accepts a configured value", () => {
+  expect(load().config.batchSize).toBe(50);
+  jest.resetModules();
+  process.env.PROCESSOR_BATCH_SIZE = "2";
+  expect(load().config.batchSize).toBe(2);
+});
+test.each(["", "0", "-1", "1.5", "1001", "abc"])(
+  "rejects invalid PROCESSOR_BATCH_SIZE %s",
+  (value) => {
+    process.env.PROCESSOR_BATCH_SIZE = value;
+    expect(load).toThrow(/PROCESSOR_BATCH_SIZE/);
+  },
+);
+
+test("PROCESSOR_POLL_INTERVAL_MS retains its default and accepts a configured value", () => {
+  expect(load().config.pollIntervalMs).toBe(2000);
+  jest.resetModules();
+  process.env.PROCESSOR_POLL_INTERVAL_MS = "101";
+  expect(load().config.pollIntervalMs).toBe(101);
+});
+test.each(["", "0", "-1", "1.5", "60001", "abc"])(
+  "rejects invalid PROCESSOR_POLL_INTERVAL_MS %s",
+  (value) => {
+    process.env.PROCESSOR_POLL_INTERVAL_MS = value;
+    expect(load).toThrow(/PROCESSOR_POLL_INTERVAL_MS/);
+  },
+);
+
+test("SCHEDULER_BATCH_SIZE retains its default and accepts a configured value", () => {
+  expect(load().config.scheduleBatchSize).toBe(50);
+  jest.resetModules();
+  process.env.SCHEDULER_BATCH_SIZE = "2";
+  expect(load().config.scheduleBatchSize).toBe(2);
+});
+test.each(["", "0", "-1", "1.5", "501", "abc"])(
+  "rejects invalid SCHEDULER_BATCH_SIZE %s",
+  (value) => {
+    process.env.SCHEDULER_BATCH_SIZE = value;
+    expect(load).toThrow(/SCHEDULER_BATCH_SIZE/);
+  },
+);

@@ -121,3 +121,8 @@ test("cancels any queued run committed after workflow deletion", async () => {
     },
   });
 });
+
+test("uses the configured action dispatch batch size", async () => {
+  await dispatchActions(db, publish, now, 7);
+  expect(db.actionRun.findMany.mock.calls[0][0].take).toBe(7);
+});

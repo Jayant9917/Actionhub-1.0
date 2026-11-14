@@ -4,7 +4,12 @@ import { createActionJob } from "./payload.js";
 type Database = Pick<PrismaClient, "$transaction" | "zapRunOutbox" | "actionRun" | "legacyJob">;
 type Publish = (job: ReturnType<typeof createActionJob>) => Promise<void>;
 
-export async function dispatchActions(db: Database, publish: Publish, now = new Date()) {
+export async function dispatchActions(
+  db: Database,
+  publish: Publish,
+  now = new Date(),
+  batchSize = 50,
+) {
   // Old outbox records predate action snapshots. Backfill once, atomically, then retire them.
   const outbox = await db.zapRunOutbox.findMany({ take: 10, orderBy: { id: "asc" } });
   for (const entry of outbox) {
@@ -65,7 +70,7 @@ export async function dispatchActions(db: Database, publish: Publish, now = new 
       dispatchAfter: { lte: now },
     },
     orderBy: { createdAt: "asc" },
-    take: 50,
+    take: batchSize,
   });
   for (const run of due) {
     // A short dispatch lease limits duplicate publication across processor instances.

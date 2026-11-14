@@ -120,3 +120,9 @@ test("dispatches a custom timer once and preserves its twelve-minute cadence", a
   });
   expect(tx.zapRun.create.mock.calls[0][0].data.metadata.schedule.intervalMinutes).toBe(12);
 });
+
+test("uses the configured scheduler batch size", async () => {
+  const { db } = database();
+  await dispatchSchedules(db, now, 8);
+  expect(db.scheduleTrigger.findMany.mock.calls[0][0].take).toBe(8);
+});
