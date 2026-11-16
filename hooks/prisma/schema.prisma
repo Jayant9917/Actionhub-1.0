@@ -9,6 +9,7 @@ datasource db {
 }
 
 model User {
+  passwordHashed Boolean @default(false)
   googleSubject String? @unique
   googleOAuthFlows GoogleOAuthFlow[]
   credentials Credential[]
@@ -221,4 +222,12 @@ model GoogleOAuthFlow {
   expiresAt DateTime
   createdAt DateTime @default(now())
   @@index([expiresAt])
+}
+
+// Shared authentication throttles. Keys are HMAC digests, never raw IPs/emails.
+model AuthRateLimit {
+  key String @id
+  hits Int
+  resetAt DateTime
+  @@index([resetAt])
 }

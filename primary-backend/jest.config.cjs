@@ -20,6 +20,11 @@ module.exports = {
   },
   moduleNameMapper: { "^(\\.{1,2}/.*)\\.js$": "$1" },
   collectCoverageFrom: [
+    "src/passwords.ts",
+    "src/password-migration.ts",
+    "src/sessions.ts",
+    "src/user-auth.ts",
+    "src/auth-rate-limit.ts",
     "src/delete-workflow.ts",
     "src/test-event.ts",
     "src/templates.ts",

@@ -19,7 +19,8 @@
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx,.mjs,.cjs --max-warnings 0",
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "migrate:passwords": "tsx scripts/hash-legacy-passwords.ts"
   },
   "keywords": [],
   "author": "",

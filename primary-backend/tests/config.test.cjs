@@ -74,3 +74,25 @@ test("development explicitly enables test events unless Node is production", () 
   process.env.NODE_ENV = "production";
   expect(load().config.testEventsEnabled).toBe(false);
 });
+
+test("authentication limits have safe defaults", () => {
+  expect(load().config.authLimits).toEqual({
+    loginWindowMs: 900000,
+    loginIpLimit: 30,
+    loginAccountLimit: 10,
+    signupWindowMs: 3600000,
+    signupIpLimit: 5,
+  });
+});
+test.each([
+  "AUTH_LOGIN_IP_LIMIT",
+  "AUTH_LOGIN_ACCOUNT_LIMIT",
+  "AUTH_SIGNUP_IP_LIMIT",
+  "AUTH_LOGIN_WINDOW_MS",
+  "AUTH_SIGNUP_WINDOW_MS",
+])("validates %s", (name) => {
+  process.env[name] = "0";
+  expect(load).toThrow(name);
+  process.env[name] = "2000";
+  expect(load().config.authLimits).toBeDefined();
+});

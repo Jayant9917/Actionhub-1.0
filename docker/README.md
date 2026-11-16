@@ -142,3 +142,11 @@ docker compose --env-file .env.docker up -d --no-build --no-deps primary-backend
 Refresh the browser. Its origin must match GOOGLE_OAUTH_PUBLIC_URL. If using ngrok or a production HTTPS domain, change the public URL, register that origin's two corresponding callbacks in Google, and open ActionHub through that URL. Google localhost development needs no ngrok.
 
 Google's external Testing mode can expire Sheets refresh tokens after seven days; reconnect when prompted. Public rollout can require Google app verification. OAuth connects the account; users still enter a spreadsheet URL/ID, range and columns, and must have write access to the sheet. Revoke in ActionHub disables the local connection; Google's account permissions page controls the external Google grant. The login and Sheets connections are separate.
+
+## Authentication limits and password upgrade
+
+Root `.env.docker` controls API authentication limits: `AUTH_LOGIN_WINDOW_MS=900000`, `AUTH_LOGIN_IP_LIMIT=30`, `AUTH_LOGIN_ACCOUNT_LIMIT=10` (per IP/email pair), `AUTH_SIGNUP_WINDOW_MS=3600000`, `AUTH_SIGNUP_IP_LIMIT=5`. Windows are milliseconds. Counters are shared in PostgreSQL; limits apply to successful and failed attempts. Recreate the API after editing settings.
+
+`db-init` runs database migrations, then `npm run migrate:passwords`, then seed. On the first security upgrade, stop the old API before running this task. The password upgrade is resumable and does not change users' passwords; Google-only users are skipped. Both login methods now issue 12-hour sessions, and old non-expiring tokens are rejected.
+
+The API trusts exactly one private Nginx hop. Nginx overwrites forwarded client IPs. Keep API ports private and review this configuration before adding another proxy/load balancer. Local Docker NAT or tunnels can group users under one IP.

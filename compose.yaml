@@ -85,7 +85,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: [sh, -c, "npx prisma migrate deploy --config prisma.config.ts && npx tsx seed.ts"]
+    command:
+      [
+        sh,
+        -c,
+        "npx prisma migrate deploy --config prisma.config.ts && npm run migrate:passwords && npx tsx seed.ts",
+      ]
 
   # API for login and managing workflows. Waits for database setup to finish.
   primary-backend:
@@ -98,6 +103,11 @@ services:
       DATABASE_URL: postgresql://actionhub:actionhub_dev@postgres:5432/actionhub
       PORT: 3000
       APP_ENV: ${APP_ENV:-production}
+      AUTH_LOGIN_WINDOW_MS: ${AUTH_LOGIN_WINDOW_MS:-900000}
+      AUTH_LOGIN_IP_LIMIT: ${AUTH_LOGIN_IP_LIMIT:-30}
+      AUTH_LOGIN_ACCOUNT_LIMIT: ${AUTH_LOGIN_ACCOUNT_LIMIT:-10}
+      AUTH_SIGNUP_WINDOW_MS: ${AUTH_SIGNUP_WINDOW_MS:-3600000}
+      AUTH_SIGNUP_IP_LIMIT: ${AUTH_SIGNUP_IP_LIMIT:-5}
       JWT_PASSWORD: ${JWT_PASSWORD:?Set JWT_PASSWORD in .env.docker}
       CREDENTIAL_ENCRYPTION_KEY: ${CREDENTIAL_ENCRYPTION_KEY:?Set CREDENTIAL_ENCRYPTION_KEY in .env.docker}
       GITHUB_SECRETS: ${GITHUB_SECRETS:-}

@@ -1,7 +1,7 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import type { Request, Response } from "express";
 import type { PrismaClient } from "./generated/prisma-new/client.js";
-import jwt from "jsonwebtoken";
+import { createSessionToken } from "./sessions.js";
 import { credentialContext, encryptSecret, decryptSecret } from "./credentials.js";
 import { googleOAuthOrigin, googleOAuthEnabled } from "./google-oauth-config.js";
 import type { GoogleOAuthSettings } from "./google-oauth-config.js";
@@ -271,7 +271,7 @@ export function createGoogleOAuthHandlers(
         if (!flow.ownerId) throw new Error();
         res.clearCookie("ah_google_session", cookieOptions());
         return res.json({
-          token: jwt.sign({ id: flow.ownerId }, settings.jwtSecret, { expiresIn: "12h" }),
+          token: createSessionToken(flow.ownerId, settings.jwtSecret),
         });
       } catch {
         return res

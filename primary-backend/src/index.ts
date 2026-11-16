@@ -7,7 +7,7 @@ import { createConnectionHandlers } from "./connections.js";
 import { config } from "./config.js";
 console.log("[primary-backend] Starting...");
 import express from "express";
-import { userRouter } from "./router/user.js";
+import { userRouter, authRateLimiters } from "./router/user.js";
 import { zapRouter } from "./router/zap.js";
 import cors from "cors";
 import { triggerRouter } from "./router/trigger.js";
@@ -16,6 +16,7 @@ import { actionRouter } from "./router/action.js";
 const PORT = config.port;
 
 const app = express();
+app.set("trust proxy", 1);
 app.use(express.json());
 app.get("/health", async (_req, res) => {
   try {
@@ -29,7 +30,7 @@ app.use(cors());
 
 const google = createGoogleOAuthHandlers(prismaClient, config.googleOAuth);
 app.get("/api/v1/oauth/google/capabilities", google.capabilities);
-app.post("/api/v1/oauth/google/login/start", google.start);
+app.post("/api/v1/oauth/google/login/start", authRateLimiters.login, google.start);
 app.post("/api/v1/oauth/google/:purpose/start", authMiddleware, google.start);
 app.get("/api/v1/oauth/google/:mode/callback", google.callback);
 app.post("/api/v1/oauth/google/session", google.session);
