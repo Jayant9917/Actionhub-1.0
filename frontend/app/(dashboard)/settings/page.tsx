@@ -1,5 +1,6 @@
 "use client";
 
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { ConnectionManager } from "@/components/workflow/ConnectionManager";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -14,6 +15,13 @@ export default function SettingsPage() {
       </div>
 
       <div className="space-y-8 max-w-2xl">
+        <Card padding="lg">
+          <CardHeader
+            title="Google sign-in"
+            subtitle="Link Google to this ActionHub account without creating a separate account."
+          />
+          <GoogleSignInButton purpose="link" />
+        </Card>
         <ConnectionManager />
         <Card padding="lg">
           <CardHeader title="Profile" subtitle="Update your personal information" />

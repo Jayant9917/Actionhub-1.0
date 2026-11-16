@@ -26,7 +26,12 @@ async function checkConnections(
     const provider = actionProviders[action.availableActionId];
     if (!provider) continue;
     const connection = await tx.credential.findFirst({
-      where: { id: action.credentialId!, ownerId, provider, revokedAt: null },
+      where: {
+        id: action.credentialId!,
+        ownerId,
+        provider: Array.isArray(provider) ? { in: provider } : provider,
+        revokedAt: null,
+      },
       select: { id: true },
     });
     if (!connection)

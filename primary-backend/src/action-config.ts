@@ -126,9 +126,9 @@ export const ActionSchema = z.discriminatedUnion("availableActionId", [
 ]);
 export const ActionsSchema = z.array(ActionSchema).min(1).max(20);
 export type ActionInput = z.infer<typeof ActionSchema>;
-export const actionProviders: Record<string, string> = {
+export const actionProviders: Record<string, string | string[]> = {
   "http.request": "http.headers",
   "discord.send_message": "discord.webhook",
   "slack.send_message": "slack.webhook",
-  "google_sheets.append_row": "google.service_account",
+  "google_sheets.append_row": ["google.service_account", "google.oauth"],
 };

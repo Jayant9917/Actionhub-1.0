@@ -30,3 +30,6 @@ dist
 # Unit-test reports
 **/coverage/
 /env setup.md
+
+# Private project explanations and interview preparation
+/learning-notes/

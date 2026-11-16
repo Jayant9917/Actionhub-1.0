@@ -3,7 +3,14 @@ import { toast } from "@/components/ui/toast";
 import { useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { actionNames, eventFields, fieldLabels, newAction, providers } from "@/lib/actions";
+import {
+  actionNames,
+  connectionMatches,
+  eventFields,
+  fieldLabels,
+  newAction,
+  providers,
+} from "@/lib/actions";
 import type { ActionDraft, Connection } from "@/lib/actions";
 
 function TemplateField({
@@ -204,8 +211,8 @@ export function ActionListEditor({
         const values = Array.isArray(action.actionMetadata.values)
           ? (action.actionMetadata.values as string[])
           : [];
-        const choices = connections.filter(
-          (item) => item.provider === providers[action.availableActionId],
+        const choices = connections.filter((item) =>
+          connectionMatches(item.provider, providers[action.availableActionId]),
         );
         return (
           <section
@@ -392,7 +399,7 @@ export function ActionListEditor({
                   maxLength={200}
                   value={text("range")}
                   onChange={(e) => metadata("range", e.target.value)}
-                  hint="For example: Sheet1!A:E. Share the spreadsheet with your service-account email as Editor."
+                  hint="For example: Sheet1!A:E. Your connected Google account needs write access. For service accounts, share the sheet with its email as Editor."
                 />
                 <p className="text-body-sm">
                   One value per column, in the order shown. Event text is written as data, not

@@ -207,3 +207,9 @@ export function apiMessage(error: unknown, fallback: string): string {
   const message = data?.message ?? data?.error;
   return typeof message === "string" ? message : fallback;
 }
+
+export function connectionMatches(provider: string, expected: string) {
+  return (
+    provider === expected || (expected === "google.service_account" && provider === "google.oauth")
+  );
+}

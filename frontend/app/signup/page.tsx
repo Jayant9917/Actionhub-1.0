@@ -1,5 +1,6 @@
 "use client";
 
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -66,6 +67,7 @@ export default function SignupPage() {
                 Log in
               </Link>
             </p>
+            <GoogleSignInButton />
             <form
               className="mt-8 space-y-6"
               onSubmit={(e) => {

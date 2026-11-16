@@ -12,12 +12,13 @@ import { encryptSecret, credentialContext } from "./credentials.js";
 const providers = [
   "slack.webhook",
   "google.service_account",
+  "google.oauth",
   "discord.webhook",
   "http.headers",
 ] as const;
 const schema = z.object({
   name: z.string().trim().min(1).max(80),
-  provider: z.enum(providers),
+  provider: z.enum(["slack.webhook", "google.service_account", "discord.webhook", "http.headers"]),
   secret: z.unknown(),
 });
 const safeFields = { id: true, name: true, provider: true, createdAt: true } as const;

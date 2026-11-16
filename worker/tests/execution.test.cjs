@@ -192,3 +192,43 @@ test("deleted workflows cannot claim an action", async () => {
   });
   expect(handler.execute).not.toHaveBeenCalled();
 });
+
+test("a Sheets OAuth credential still requires the workflow owner and allowed provider", async () => {
+  const { encryptSecret, credentialContext } = require("../src/credentials.ts");
+  const key = "ab".repeat(32),
+    credential = { id: "google-connection", ownerId: 2, provider: "google.oauth" };
+  db.actionRun.findUniqueOrThrow.mockResolvedValue({
+    id: "action",
+    zapRunId: "run",
+    type: "sheets",
+    attempts: 1,
+    credentialId: credential.id,
+    config: {},
+    zapRun: { metadata: {}, zap: { userId: 2 } },
+  });
+  db.credential = {
+    findFirst: jest.fn().mockResolvedValue({
+      ...credential,
+      encryptedSecret: encryptSecret(
+        JSON.stringify({ kind: "google.oauth", refresh_token: "refresh" }),
+        key,
+        credentialContext(credential),
+      ),
+    }),
+  };
+  const sheets = {
+    credentialProvider: ["google.service_account", "google.oauth"],
+    execute: jest.fn(),
+  };
+  await executeAction(db, job, { sheets }, () => now, key);
+  expect(db.credential.findFirst.mock.calls[0][0].where).toEqual({
+    id: credential.id,
+    ownerId: 2,
+    provider: { in: ["google.service_account", "google.oauth"] },
+    revokedAt: null,
+  });
+  expect(sheets.execute).toHaveBeenCalledWith({}, expect.any(Object), {
+    kind: "google.oauth",
+    refresh_token: "refresh",
+  });
+});

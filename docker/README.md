@@ -111,3 +111,34 @@ For a stopped or first-time stack, use the normal full `docker compose --env-fil
 One partition can feed only one consumer in the shared group. For example, three partitions plus three workers with concurrency one can use all three workers; three partitions plus one worker with concurrency three can instead run those partitions concurrently in one container. More concurrency than available partitions does not add parallelism. Keep the group ID unchanged; different groups each consume the stream independently.
 
 Only partitions/replicas/tuning are configurable here. Kafka topic and worker group stay fixed to avoid accidentally switching streams or replaying work. Kafka replication factor stays one because this stack has one broker. More partitions do not provide broker fault tolerance. Replica changes are manual, not automatic traffic-based scaling. Watch consumer lag, action delay, provider limits, database connections, CPU and RAM before increasing values. Multiple processors use database claims but may contend for the same rows, so throughput does not necessarily increase linearly.
+
+## Optional Google sign-in and Sheets OAuth
+
+Google supports two separate permissions: Continue with Google on login/signup (identity only), and Connect Google Sheets in an action (offline spreadsheet access). Existing password users can link Google from Settings while signed in; matching email addresses never silently merge accounts. Slack/Discord keep their webhook connections. Service-account Sheets connections remain supported.
+
+Create a Google Cloud OAuth client of type Web application and enable Google Sheets API. Configure the consent screen and add your test users while the app is in Testing. Set these private root .env.docker values:
+
+```env
+GOOGLE_OAUTH_PUBLIC_URL=http://localhost:8080
+GOOGLE_OAUTH_CLIENT_ID=YOUR_WEB_CLIENT_ID
+GOOGLE_OAUTH_CLIENT_SECRET=YOUR_CLIENT_SECRET
+```
+
+Register both authorized redirect URIs exactly:
+
+```text
+http://localhost:8080/api/v1/oauth/google/login/callback
+http://localhost:8080/api/v1/oauth/google/sheets/callback
+```
+
+Use the same client for API and worker; Compose injects the values automatically. Public URL is only needed by the API. Never put the secret in NEXT_PUBLIC variables. Keep the existing encryption key stable. Blank settings disable the new Google flows without breaking manual login/connections.
+
+Apply credentials after editing (no image rebuild):
+
+```powershell
+docker compose --env-file .env.docker up -d --no-build --no-deps primary-backend worker
+```
+
+Refresh the browser. Its origin must match GOOGLE_OAUTH_PUBLIC_URL. If using ngrok or a production HTTPS domain, change the public URL, register that origin's two corresponding callbacks in Google, and open ActionHub through that URL. Google localhost development needs no ngrok.
+
+Google's external Testing mode can expire Sheets refresh tokens after seven days; reconnect when prompted. Public rollout can require Google app verification. OAuth connects the account; users still enter a spreadsheet URL/ID, range and columns, and must have write access to the sheet. Revoke in ActionHub disables the local connection; Google's account permissions page controls the external Google grant. The login and Sheets connections are separate.

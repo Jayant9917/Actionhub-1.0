@@ -56,7 +56,9 @@ export async function executeAction(
         where: {
           id: run.credentialId,
           ownerId: run.zapRun.zap.userId,
-          provider: handler.credentialProvider,
+          provider: Array.isArray(handler.credentialProvider)
+            ? { in: handler.credentialProvider }
+            : handler.credentialProvider,
           revokedAt: null,
         },
       });

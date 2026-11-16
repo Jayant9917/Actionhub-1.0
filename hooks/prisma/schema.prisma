@@ -9,6 +9,8 @@ datasource db {
 }
 
 model User {
+  googleSubject String? @unique
+  googleOAuthFlows GoogleOAuthFlow[]
   credentials Credential[]
   id       Int     @id @default(autoincrement())
   name     String?
@@ -200,4 +202,23 @@ model ScheduleTrigger {
   nextRunAt DateTime
   workflow Zap @relation(fields: [workflowId], references: [id], onDelete: Cascade)
   @@index([enabled, nextRunAt])
+}
+
+// Browser-bound, single-use Google login/link/Sheets authorization attempts.
+model GoogleOAuthFlow {
+  id String @id
+  ownerId Int?
+  owner User? @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  purpose String
+  bindingHash String
+  nonceHash String
+  verifier String
+  name String
+  status String @default("pending")
+  credentialId String?
+  sessionHash String? @unique
+  sessionExpiresAt DateTime?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([expiresAt])
 }

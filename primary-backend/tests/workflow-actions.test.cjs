@@ -210,3 +210,19 @@ test.each(["missing", "wrong-trigger", "no-key"])(
     expect(db.$transaction).not.toHaveBeenCalled();
   },
 );
+
+test("Sheets accepts only the owner's active OAuth or service-account connection", async () => {
+  req.body.actions = [
+    {
+      availableActionId: "google_sheets.append_row",
+      credentialId: connection,
+      actionMetadata: { spreadsheetId: "sheet123", range: "Sheet1!A:A", values: ["Hello"] },
+    },
+  ];
+  await handlers().update(req, res);
+  expect(tx.credential.findFirst.mock.calls[0][0].where).toMatchObject({
+    ownerId: 2,
+    revokedAt: null,
+    provider: { in: ["google.service_account", "google.oauth"] },
+  });
+});

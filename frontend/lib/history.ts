@@ -31,6 +31,10 @@ export const statusLabels: Record<string, string> = {
 export function errorExplanation(code: string | null): string {
   if (!code) return "";
   const messages: Record<string, string> = {
+    GOOGLE_RECONNECT_REQUIRED:
+      "Google access expired or was revoked. Connect Google Sheets again and select the new connection in this action.",
+    GOOGLE_OAUTH_NOT_CONFIGURED:
+      "The worker needs its Google OAuth client settings. Ask the administrator to finish setup.",
     HTTP_DESTINATION_BLOCKED:
       "This address resolves to a private or reserved network. Use a public HTTPS API.",
     HTTP_ORIGIN_MISMATCH:

@@ -1,3 +1,4 @@
+import { createGoogleOAuthHandlers } from "./google-oauth.js";
 import { createRunHistoryHandlers } from "./run-history.js";
 import { prismaClient } from "./db/index.js";
 import { Router } from "express";
@@ -26,6 +27,13 @@ app.get("/health", async (_req, res) => {
 });
 app.use(cors());
 
+const google = createGoogleOAuthHandlers(prismaClient, config.googleOAuth);
+app.get("/api/v1/oauth/google/capabilities", google.capabilities);
+app.post("/api/v1/oauth/google/login/start", google.start);
+app.post("/api/v1/oauth/google/:purpose/start", authMiddleware, google.start);
+app.get("/api/v1/oauth/google/:mode/callback", google.callback);
+app.post("/api/v1/oauth/google/session", google.session);
+app.get("/api/v1/oauth/google/attempt/:attemptId", authMiddleware, google.status);
 const connections = createConnectionHandlers(prismaClient, config.encryptionKey);
 const connectionRouter = Router();
 connectionRouter.use(authMiddleware);

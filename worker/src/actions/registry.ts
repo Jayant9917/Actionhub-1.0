@@ -1,5 +1,5 @@
 export type ActionHandler = {
-  credentialProvider?: string;
+  credentialProvider?: string | string[];
   execute(config: unknown, context: unknown, credential?: unknown): Promise<void>;
 };
 

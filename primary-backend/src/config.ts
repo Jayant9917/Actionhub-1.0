@@ -40,6 +40,13 @@ export const config = {
   port: port("PORT", 3000),
   encryptionKey: readEncryptionKey(process.env.CREDENTIAL_ENCRYPTION_KEY),
   githubSetupSecret: process.env.GITHUB_SECRETS,
+  googleOAuth: {
+    publicUrl: process.env.GOOGLE_OAUTH_PUBLIC_URL,
+    clientId: process.env.GOOGLE_OAUTH_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+    encryptionKey: readEncryptionKey(process.env.CREDENTIAL_ENCRYPTION_KEY),
+    jwtSecret: required("JWT_PASSWORD"),
+  },
   githubSetupWorkflowId: process.env.GITHUB_SETUP_WORKFLOW_ID,
 };
 export const JWT_PASSWORD = required("JWT_PASSWORD");

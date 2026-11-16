@@ -1,4 +1,4 @@
-import { parseGoogleConnection } from "../connection-secrets.js";
+import { parseGoogleConnection, parseGoogleOAuthConnection } from "../connection-secrets.js";
 import { renderCell } from "../templates.js";
 import { googleAccessToken } from "../google-token.js";
 import { ActionError } from "./registry.js";
@@ -10,11 +10,14 @@ export function createSheetsHandler(
   getToken = googleAccessToken,
 ): ActionHandler {
   return {
-    credentialProvider: "google.service_account",
+    credentialProvider: ["google.service_account", "google.oauth"],
     async execute(config, context, credential) {
       let connection;
       try {
-        connection = parseGoogleConnection(credential);
+        connection =
+          (credential as { kind?: unknown } | null)?.kind === "google.oauth"
+            ? parseGoogleOAuthConnection(credential)
+            : parseGoogleConnection(credential);
       } catch {
         throw new ActionError("INVALID_GOOGLE_CONNECTION", "failed");
       }

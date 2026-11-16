@@ -55,3 +55,18 @@ export function parseDiscordConnection(input: unknown): { webhookUrl: string } {
     throw new Error("INVALID_DISCORD_CONNECTION");
   return { webhookUrl: url.toString() };
 }
+
+export function parseGoogleOAuthConnection(input: unknown): {
+  kind: "google.oauth";
+  refresh_token: string;
+} {
+  const data = input as { kind?: unknown; refresh_token?: unknown } | null;
+  if (
+    data?.kind !== "google.oauth" ||
+    typeof data.refresh_token !== "string" ||
+    !data.refresh_token ||
+    data.refresh_token.length > 10000
+  )
+    throw new Error("INVALID_GOOGLE_CONNECTION");
+  return { kind: "google.oauth", refresh_token: data.refresh_token };
+}

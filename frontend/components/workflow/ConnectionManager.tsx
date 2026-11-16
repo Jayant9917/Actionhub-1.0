@@ -3,7 +3,8 @@ import { useToastFeedback } from "@/components/ui/toast";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "@/app/config";
-import { apiMessage, apiOptions } from "@/lib/actions";
+import { GoogleSheetsConnect } from "./GoogleSheetsConnect";
+import { apiMessage, apiOptions, connectionMatches } from "@/lib/actions";
 import type { Connection } from "@/lib/actions";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -95,12 +96,20 @@ export function ConnectionManager({
       setError("Could not revoke connection.");
     }
   }
+  async function googleConnected(id: string) {
+    await refresh();
+    onChanged?.();
+    onConnected?.(id);
+  }
   const content = (
     <>
+      {(!providerFilter || providerFilter === "google.service_account") && (
+        <GoogleSheetsConnect onConnected={(id) => void googleConnected(id)} />
+      )}
       {!compact && (
         <CardHeader
           title="Your connections"
-          subtitle="Save your own Discord/Slack channel and Google service account. Credentials are private and are not displayed again."
+          subtitle="Save your webhook connections or connect Google Sheets. Credentials are private and are not displayed again."
         />
       )}
       {compact && (
@@ -115,7 +124,10 @@ export function ConnectionManager({
       )}
       <ul className="space-y-2 mb-5">
         {connections
-          .filter((connection) => !providerFilter || connection.provider === providerFilter)
+          .filter(
+            (connection) =>
+              !providerFilter || connectionMatches(connection.provider, providerFilter),
+          )
           .map((connection) => (
             <li
               key={connection.id}
@@ -141,18 +153,20 @@ export function ConnectionManager({
                     Use account
                   </Button>
                 )}
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setEditing(connection.id);
-                    setName(connection.name);
-                    setProvider(connection.provider);
-                    setSecret("");
-                    setMessage("");
-                  }}
-                >
-                  Replace credentials
-                </Button>
+                {connection.provider !== "google.oauth" && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setEditing(connection.id);
+                      setName(connection.name);
+                      setProvider(connection.provider);
+                      setSecret("");
+                      setMessage("");
+                    }}
+                  >
+                    Replace credentials
+                  </Button>
+                )}
                 <Button variant="ghostDanger" onClick={() => void revoke(connection.id)}>
                   Revoke
                 </Button>

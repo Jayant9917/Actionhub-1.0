@@ -26,6 +26,9 @@ module.exports = {
     "src/action-config.ts",
     "src/connection-secrets.ts",
     "src/connections.ts",
+    "src/google-oauth.ts",
+    "src/google-identity.ts",
+    "src/google-oauth-config.ts",
     "src/workflow-actions.ts",
 
     "src/config.ts",
