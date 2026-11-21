@@ -8,15 +8,18 @@ const PAINS = [
     title: "Manual work that doesn’t scale",
     description:
       "Copy-paste between tools, repeat the same tasks, and chase updates instead of building.",
+    badgeColors: "bg-amber-100 text-amber-700",
   },
   {
     title: "Integrations that break or never ship",
     description:
       "Custom code and one-off scripts that are hard to maintain and impossible to hand off.",
+    badgeColors: "bg-sky-100 text-sky-700",
   },
   {
     title: "Time lost on busywork",
     description: "Hours every week on repetitive workflows that could run in the background.",
+    badgeColors: "bg-violet-100 text-violet-700",
   },
 ];
 
@@ -48,7 +51,9 @@ export function ProblemSection() {
                 transition={{ duration: reduceMotion ? 0 : 0.4, delay: reduceMotion ? 0 : i * 0.1 }}
                 className="rounded-2xl border border-neutral-200 bg-white p-8 text-left transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-[0_16px_40px_-24px_rgba(0,179,255,0.35)] dark:border-neutral-200 dark:bg-neutral-100/80"
               >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-100 text-neutral-600 dark:bg-neutral-100 dark:text-neutral-900">
+                <div
+                  className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl ${item.badgeColors}`}
+                >
                   <span className="text-body font-semibold">{i + 1}</span>
                 </div>
                 <h3 className="text-title-sm text-neutral-900 dark:text-neutral-900">
