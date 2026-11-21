@@ -7,7 +7,8 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Automate — Workflow automation",
+  title: "actiohub — Workflow automation",
+  applicationName: "actiohub",
   description: "Connect your apps and automate workflows. No code required.",
 };
 

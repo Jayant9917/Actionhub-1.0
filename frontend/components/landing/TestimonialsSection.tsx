@@ -28,7 +28,7 @@ export function TestimonialsSection() {
         <div className="container-content text-center">
           <h2 className="section-heading">Loved by teams who ship</h2>
           <p className="section-subtext">
-            See why teams switch to Automate to run workflows without the complexity.
+            See why teams switch to actiohub to run workflows without the complexity.
           </p>
           <div className="mt-16 grid gap-8 md:grid-cols-3">
             {QUOTES.map(({ quote, author, role }) => (

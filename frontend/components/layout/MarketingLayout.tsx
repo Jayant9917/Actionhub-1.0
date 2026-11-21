@@ -52,7 +52,7 @@ export function MarketingLayout({ children }: { children: React.ReactNode }) {
             href="/"
             className="text-title font-semibold text-neutral-900 transition-opacity duration-fast hover:opacity-80"
           >
-            Automate
+            actiohub
           </Link>
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-3 lg:flex" aria-label="Primary navigation">
             <Link
