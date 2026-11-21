@@ -39,7 +39,7 @@ export function FAQSection() {
       <section
         id="faq"
         aria-labelledby="faq-heading"
-        className="section-padding bg-[#f2f1ed] text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100"
+        className="section-padding bg-[#f2f1ed] text-[#171717]"
       >
         <div className="container-content mx-auto max-w-4xl">
           <h2
@@ -50,17 +50,17 @@ export function FAQSection() {
           </h2>
           <div>
             {FAQS.map(({ question, answer }) => (
-              <details key={question} className="group border-t border-neutral-300 last:border-b dark:border-neutral-700">
+              <details key={question} className="group border-t border-[#d4d4d4] last:border-b">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-base font-medium focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-600 md:text-lg [&::-webkit-details-marker]:hidden">
                   <span>{question}</span>
                   <span
                     aria-hidden="true"
-                    className="text-2xl font-normal leading-none text-neutral-600 transition-transform duration-200 group-open:rotate-45 dark:text-neutral-300"
+                    className="text-2xl font-normal leading-none text-[#525252] transition-transform duration-200 group-open:rotate-45"
                   >
                     +
                   </span>
                 </summary>
-                <p className="max-w-3xl pb-5 pr-10 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400 md:text-base">
+                <p className="max-w-3xl pb-5 pr-10 text-sm leading-relaxed text-[#525252] md:text-base">
                   {answer}
                 </p>
               </details>
