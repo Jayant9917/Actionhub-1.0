@@ -54,7 +54,35 @@ export function MarketingLayout({ children }: { children: React.ReactNode }) {
           >
             Automate
           </Link>
-          <nav className="hidden items-center gap-2 md:flex" aria-label="Primary navigation">
+          <nav className="hidden items-center gap-3 md:flex" aria-label="Primary navigation">
+            <Link
+              href="/#how-it-works"
+              className="rounded-md px-2 py-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+            >
+              How it works
+            </Link>
+            <Link
+              href="/#pricing"
+              className="rounded-md px-2 py-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+            >
+              Pricing
+            </Link>
+            <a
+              href="https://github.com/Jayant9917/Actionhub-1.0/blob/main/README.md"
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-md px-2 py-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+            >
+              Docs
+            </a>
+            <a
+              href="https://github.com/Jayant9917/Actionhub-1.0/tree/main"
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-md px-2 py-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+            >
+              GitHub
+            </a>
             <ThemeSwitcher />
             {authChecked &&
               (user ? (
@@ -116,6 +144,40 @@ export function MarketingLayout({ children }: { children: React.ReactNode }) {
           className="absolute inset-x-0 top-full border-b border-neutral-200 bg-white px-4 py-4 shadow-soft md:hidden"
         >
           <div className="container-content mx-auto flex flex-col gap-3">
+            <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+              <Link
+                href="/#how-it-works"
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-md px-2 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+              >
+                How it works
+              </Link>
+              <Link
+                href="/#pricing"
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-md px-2 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+              >
+                Pricing
+              </Link>
+              <a
+                href="https://github.com/Jayant9917/Actionhub-1.0/blob/main/README.md"
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-md px-2 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+              >
+                Docs
+              </a>
+              <a
+                href="https://github.com/Jayant9917/Actionhub-1.0/tree/main"
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-md px-2 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+              >
+                GitHub
+              </a>
+            </div>
             <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
               <span className="text-body-sm font-medium text-neutral-600">Appearance</span>
               <ThemeSwitcher />
