@@ -64,8 +64,8 @@ export function PricingPreviewSection() {
               </ul>
               <Button
                 variant="primary"
-                size="lg"
-                className="mt-8 w-full"
+                size="md"
+                className="mt-8 whitespace-nowrap"
                 onClick={() => router.push("/signup")}
               >
                 Get started free
