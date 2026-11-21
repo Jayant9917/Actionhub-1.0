@@ -13,7 +13,7 @@ export function HeroSection() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-[radial-gradient(ellipse_at_50%_0%,rgba(163,163,163,0.18),transparent_68%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.08),transparent_68%)]" />
       <div className="container-content relative">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3.5 py-1.5 text-xs font-medium text-neutral-600 shadow-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-600">
+          <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3.5 py-1.5 text-xs font-medium text-neutral-600 shadow-sm dark:border-neutral-300 dark:bg-neutral-100 dark:text-neutral-900">
             <Sparkles size={14} aria-hidden="true" /> No-code automation, without the busywork
           </div>
           <h1 className="text-display-sm font-semibold tracking-[-0.045em] text-neutral-900 md:text-display lg:text-[3.75rem] lg:leading-[1.08]">

@@ -101,18 +101,18 @@ export function WorkflowDemo() {
   return (
     <section
       aria-label="Try an example workflow"
-      className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_32px_100px_-48px_rgba(0,0,0,0.42)] dark:border-neutral-700 dark:bg-neutral-950"
+      className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_32px_100px_-48px_rgba(0,0,0,0.42)] dark:border-neutral-300 dark:bg-neutral-950"
     >
-      <div className="flex flex-col gap-4 border-b border-neutral-200 px-4 py-4 dark:border-neutral-800 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="flex flex-col gap-4 border-b border-neutral-200 px-4 py-4 dark:border-neutral-300 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
           <div className="flex items-center gap-2 text-sm font-semibold text-neutral-900 dark:text-neutral-900">
             <span className="flex size-7 items-center justify-center rounded-lg" style={{ backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }}><Zap size={15} aria-hidden="true" /></span>
             Workflow playground
-            <span className="inline-flex shrink-0 whitespace-nowrap rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-medium leading-none uppercase tracking-wide text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">Sample data</span>
+            <span className="inline-flex shrink-0 whitespace-nowrap rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-medium leading-none uppercase tracking-wide text-neutral-500 dark:bg-neutral-100 dark:text-neutral-900">Sample data</span>
           </div>
           <p className="mt-1 pl-9 text-xs text-neutral-500">Choose a flow and watch ActionHub do the busywork.</p>
         </div>
-        <div className="flex items-center gap-2 self-start rounded-full border border-neutral-200 px-3 py-1.5 text-xs text-neutral-500 dark:border-neutral-800 sm:self-auto">
+        <div className="flex items-center gap-2 self-start rounded-full border border-neutral-200 px-3 py-1.5 text-xs text-neutral-500 dark:border-neutral-300 sm:self-auto">
           <span className={`size-1.5 rounded-full ${status === "running" ? "animate-pulse bg-amber-500" : status === "complete" ? "bg-emerald-500" : "bg-neutral-400"}`} />
           {status === "running" ? "Running demo" : status === "complete" ? "Demo complete" : "Ready to run"}
         </div>
@@ -134,7 +134,7 @@ export function WorkflowDemo() {
                 selectWorkflow(workflows[next].id);
                 (event.currentTarget.parentElement?.children[next] as HTMLButtonElement)?.focus();
               }}
-              className={`rounded-xl border px-3 py-2.5 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 dark:focus-visible:ring-white ${selectedId === item.id ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-neutral-950" : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-600 dark:hover:border-neutral-600"}`}
+              className={`rounded-xl border px-3 py-2.5 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 dark:focus-visible:ring-white ${selectedId === item.id ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-neutral-950" : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400 dark:border-neutral-300 dark:bg-neutral-950 dark:text-neutral-600 dark:hover:border-neutral-600"}`}
               style={selectedId === item.id ? { backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" } : undefined}
             >
               <span className="mr-2 text-[10px] opacity-60">0{index + 1}</span>{item.name}
@@ -151,8 +151,8 @@ export function WorkflowDemo() {
                 <motion.div
                   aria-current={isActive ? "step" : undefined}
                   animate={{
-                    borderColor: isActive ? "rgba(23,23,23,0.55)" : isDone ? "rgba(16,185,129,0.5)" : "rgba(163,163,163,0.28)",
-                    backgroundColor: isActive ? "rgba(23,23,23,0.035)" : "rgba(255,255,255,0)",
+                    borderColor: isActive ? "rgb(var(--color-text) / 0.55)" : isDone ? "rgba(16,185,129,0.5)" : "rgb(var(--color-border))",
+                    backgroundColor: isActive ? "rgb(var(--color-bg-muted))" : "transparent",
                     y: isActive && !reduceMotion ? -2 : 0,
                   }}
                   transition={{ duration: reduceMotion ? 0 : 0.24 }}
@@ -167,7 +167,7 @@ export function WorkflowDemo() {
                     <span className="mt-0.5 block truncate text-xs text-neutral-500 dark:text-neutral-400">{detail}</span>
                   </span>
                   <span className="flex size-5 shrink-0 items-center justify-center">
-                    {isDone ? <CircleCheck className="size-4 text-emerald-600 dark:text-emerald-400" aria-label="Completed" /> : isActive ? <span className="size-2 rounded-full bg-neutral-900 dark:bg-white" aria-label="Running" /> : null}
+                    {isDone ? <CircleCheck className="size-4 text-emerald-600 dark:text-emerald-400" aria-label="Completed" /> : isActive ? <span className="size-2 rounded-full bg-neutral-900 dark:bg-neutral-900" aria-label="Running" /> : null}
                   </span>
                 </motion.div>
                 {index < workflow.steps.length - 1 && (
@@ -184,7 +184,7 @@ export function WorkflowDemo() {
           })}
         </div>
 
-        <div className="mt-6 flex flex-col gap-4 border-t border-neutral-100 pt-5 dark:border-neutral-800 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-6 flex flex-col gap-4 border-t border-neutral-100 pt-5 dark:border-neutral-300 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-h-11 flex-1" aria-live="polite" aria-atomic="true">
             <AnimatePresence mode="wait">
               {status === "complete" ? (

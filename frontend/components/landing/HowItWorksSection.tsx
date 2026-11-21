@@ -85,7 +85,7 @@ function ShipIcon({ className }: { className?: string }) {
 
 function IntegrationMark({ src, label }: { src: string; label: string }) {
   return (
-    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-neutral-200 bg-white dark:border-neutral-200 dark:bg-neutral-50">
+    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-neutral-200 bg-white dark:border-neutral-300 dark:bg-neutral-100">
       <Image src={src} alt="" width={20} height={20} className="size-5 object-contain" />
       <span className="sr-only">{label}</span>
     </span>
@@ -94,7 +94,7 @@ function IntegrationMark({ src, label }: { src: string; label: string }) {
 
 function FieldChip({ label, value }: { label: string; value: string }) {
   return (
-    <div className="min-w-0 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-left dark:border-neutral-200 dark:bg-neutral-50">
+    <div className="min-w-0 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-left dark:border-neutral-300 dark:bg-neutral-100">
       <span className="block text-[11px] font-medium text-neutral-500 dark:text-neutral-600">
         {label}
       </span>
@@ -164,7 +164,7 @@ export function HowItWorksSection() {
                   className={`relative z-10 flex max-w-[240px] flex-[1_1_170px] items-center gap-3 rounded-xl border px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 md:max-w-none ${
                     isActive
                       ? "border-neutral-900 bg-neutral-900 text-white dark:border-neutral-100 dark:bg-neutral-100 dark:text-neutral-900"
-                      : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400 dark:border-neutral-200 dark:bg-neutral-50 dark:text-neutral-600"
+                      : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400 dark:border-neutral-300 dark:bg-neutral-100 dark:text-neutral-600"
                   }`}
                 >
                   <span
@@ -193,8 +193,8 @@ export function HowItWorksSection() {
             })}
           </div>
 
-          <div className="mx-auto mt-6 w-full max-w-5xl overflow-hidden rounded-3xl border border-neutral-200 bg-white text-left shadow-[0_24px_70px_-48px_rgba(0,0,0,0.32)] dark:border-neutral-200 dark:bg-neutral-50">
-            <div className="flex items-center justify-between gap-4 border-b border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-neutral-200 dark:bg-neutral-50 sm:px-6">
+          <div className="mx-auto mt-6 w-full max-w-5xl overflow-hidden rounded-3xl border border-neutral-200 bg-white text-left shadow-[0_24px_70px_-48px_rgba(0,0,0,0.32)] dark:border-neutral-300 dark:bg-neutral-100">
+            <div className="flex items-center justify-between gap-4 border-b border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-neutral-300 dark:bg-neutral-100 sm:px-6">
               <div className="flex min-w-0 items-center gap-3">
                 <span className="flex size-8 items-center justify-center rounded-lg bg-white text-neutral-700 dark:bg-neutral-100 dark:text-neutral-900">
                   <Clock3 size={16} aria-hidden="true" />
@@ -208,7 +208,7 @@ export function HowItWorksSection() {
                   </p>
                 </div>
               </div>
-              <span className="shrink-0 rounded-full border border-neutral-200 bg-white px-3 py-1 text-[11px] font-medium text-neutral-500 dark:border-neutral-200 dark:bg-neutral-50 dark:text-neutral-600">
+              <span className="shrink-0 rounded-full border border-neutral-200 bg-white px-3 py-1 text-[11px] font-medium text-neutral-500 dark:border-neutral-300 dark:bg-neutral-100 dark:text-neutral-600">
                 Preview
               </span>
             </div>
@@ -257,7 +257,6 @@ export function HowItWorksSection() {
                               duration: transitionDuration,
                               delay: reduceMotion ? 0 : index * 0.07,
                             }}
-                            className={field.label === "Title" ? "sm:col-span-2" : ""}
                           >
                             <FieldChip {...field} />
                           </motion.div>
@@ -296,7 +295,7 @@ export function HowItWorksSection() {
                           duration: transitionDuration,
                           delay: reduceMotion ? 0 : 0.08,
                         }}
-                        className="rounded-2xl border border-neutral-200 bg-white p-3 dark:border-neutral-200 dark:bg-neutral-50"
+                        className="rounded-2xl border border-neutral-200 bg-white p-3 dark:border-neutral-300 dark:bg-neutral-100"
                       >
                         <div className="mb-3 flex items-center gap-2">
                           <IntegrationMark src="/sheets.png" label="Google Sheets" />
@@ -344,7 +343,7 @@ export function HowItWorksSection() {
                           duration: transitionDuration,
                           delay: reduceMotion ? 0 : 0.42,
                         }}
-                        className="rounded-2xl border border-neutral-200 bg-white p-3 dark:border-neutral-200 dark:bg-neutral-50"
+                        className="rounded-2xl border border-neutral-200 bg-white p-3 dark:border-neutral-300 dark:bg-neutral-100"
                       >
                         <div className="mb-2 flex items-center gap-2">
                           <IntegrationMark src="/discord.svg" label="Discord" />
@@ -380,7 +379,7 @@ export function HowItWorksSection() {
                           <Clock3 size={14} aria-hidden="true" /> Today
                         </span>
                       </div>
-                      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-200 dark:bg-neutral-50">
+                      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-300 dark:bg-neutral-100">
                         <div className="flex flex-wrap items-center justify-between gap-3 p-4">
                           <div className="flex min-w-0 items-center gap-3">
                             <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-neutral-50 text-neutral-700 dark:bg-neutral-100 dark:text-neutral-700">
