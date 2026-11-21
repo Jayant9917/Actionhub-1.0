@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "motion/react";
 import { FadeInSection } from "./FadeInSection";
 
 const STEPS = [
@@ -75,23 +76,45 @@ function ShipIcon({ className }: { className?: string }) {
 }
 
 export function HowItWorksSection() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <FadeInSection>
-      <section id="how-it-works" className="section-padding bg-white scroll-mt-20">
+      <section
+        id="how-it-works"
+        className="section-padding relative isolate scroll-mt-20 overflow-hidden bg-white dark:bg-neutral-50"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-16 top-1/4 -z-10 size-72 bg-[radial-gradient(circle,rgba(0,179,255,0.35)_1px,transparent_1.5px)] [background-size:7px_7px] opacity-30 [mask-image:radial-gradient(ellipse_at_center,#000,transparent_70%)] motion-safe:animate-pulse motion-reduce:animate-none"
+        />
         <div className="container-content text-center">
           <h2 className="section-heading">How it works</h2>
           <p className="section-subtext">
             Three steps to your first automation. No engineering ticket, no waiting.
           </p>
           <div className="mt-20 grid gap-12 md:grid-cols-3">
-            {STEPS.map(({ step, title, description, icon: Icon }) => (
-              <div key={step} className="flex flex-col items-center text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-50 text-brand-600">
-                  <Icon className="h-7 w-7" />
+            {STEPS.map(({ step, title, description, icon: Icon }, index) => (
+              <motion.div
+                key={step}
+                initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{
+                  duration: reduceMotion ? 0 : 0.4,
+                  delay: reduceMotion ? 0 : index * 0.1,
+                }}
+                className="flex flex-col items-center rounded-2xl border border-neutral-200 bg-white p-6 text-center transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-[0_16px_40px_-24px_rgba(0,179,255,0.35)] dark:border-neutral-200 dark:bg-neutral-50"
+              >
+                <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-50 text-brand-600 dark:border-neutral-200 dark:bg-neutral-100">
+                  <Icon className="h-7 w-7" aria-hidden="true" />
+                  <span className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full border border-neutral-200 bg-white text-[10px] font-semibold text-neutral-600 dark:border-neutral-200 dark:bg-neutral-50 dark:text-neutral-900">
+                    {step}
+                  </span>
                 </div>
                 <h3 className="mt-6 text-title text-neutral-900">{title}</h3>
                 <p className="mt-3 text-body text-neutral-600">{description}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
