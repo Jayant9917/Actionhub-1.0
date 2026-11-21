@@ -24,7 +24,7 @@ const QUOTES = [
 export function TestimonialsSection() {
   return (
     <FadeInSection>
-      <section className="section-padding bg-white">
+      <section className="section-padding bg-white dark:bg-[#121212]">
         <div className="container-content text-center">
           <h2 className="section-heading">Loved by teams who ship</h2>
           <p className="section-subtext">
