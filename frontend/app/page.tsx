@@ -8,6 +8,7 @@ import {
   IntegrationsSection,
   TestimonialsSection,
   PricingPreviewSection,
+  FAQSection,
   FinalCTASection,
   LandingFooter,
 } from "@/components/landing";
@@ -24,6 +25,7 @@ export default function Home() {
         <IntegrationsSection />
         <TestimonialsSection />
         <PricingPreviewSection />
+        <FAQSection />
         <FinalCTASection />
         <LandingFooter />
       </main>

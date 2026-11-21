@@ -6,6 +6,7 @@ export { FeatureSection } from "./FeatureSection";
 export { IntegrationsSection } from "./IntegrationsSection";
 export { TestimonialsSection } from "./TestimonialsSection";
 export { PricingPreviewSection } from "./PricingPreviewSection";
+export { FAQSection } from "./FAQSection";
 export { FinalCTASection } from "./FinalCTASection";
 export { LandingFooter } from "./LandingFooter";
 export { FadeInSection } from "./FadeInSection";
