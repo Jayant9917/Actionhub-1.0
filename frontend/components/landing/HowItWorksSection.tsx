@@ -218,7 +218,7 @@ export function HowItWorksSection() {
               role="region"
               aria-label={`Step ${activeStep + 1}: ${currentStep.title}`}
               aria-live="polite"
-              className="relative h-[500px] overflow-hidden p-4 sm:h-[460px] sm:p-6 md:h-[390px]"
+              className="relative overflow-hidden p-4 sm:p-6"
             >
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
@@ -227,7 +227,7 @@ export function HowItWorksSection() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
                   transition={{ duration: transitionDuration }}
-                  className="flex h-full flex-col justify-center"
+                  className="flex flex-col"
                 >
                   {activeStep === 0 && (
                     <div className="mx-auto w-full max-w-3xl">
@@ -267,7 +267,7 @@ export function HowItWorksSection() {
                   )}
 
                   {activeStep === 1 && (
-                    <div className="flex h-full flex-col justify-center gap-3 md:grid md:grid-cols-[1fr_auto_1.15fr_auto_1fr] md:items-center md:gap-3">
+                    <div className="flex flex-col gap-3 md:grid md:grid-cols-[1fr_auto_1.15fr_auto_1fr] md:items-center md:gap-3">
                       <motion.div
                         initial={reduceMotion ? false : { opacity: 0, x: -12 }}
                         animate={{ opacity: 1, x: 0 }}
