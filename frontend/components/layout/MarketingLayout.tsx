@@ -47,14 +47,14 @@ export function MarketingLayout({ children }: { children: React.ReactNode }) {
             : "border-transparent bg-transparent"
         }`}
       >
-        <div className="container-content flex h-16 items-center justify-between">
+        <div className="container-content relative flex h-16 items-center justify-between">
           <Link
             href="/"
             className="text-title font-semibold text-neutral-900 transition-opacity duration-fast hover:opacity-80"
           >
             Automate
           </Link>
-          <nav className="hidden items-center gap-3 md:flex" aria-label="Primary navigation">
+          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-3 lg:flex" aria-label="Primary navigation">
             <Link
               href="/#how-it-works"
               className="rounded-md px-2 py-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
@@ -83,6 +83,8 @@ export function MarketingLayout({ children }: { children: React.ReactNode }) {
             >
               GitHub
             </a>
+          </nav>
+          <div className="ml-auto hidden items-center gap-3 lg:flex">
             <ThemeSwitcher />
             {authChecked &&
               (user ? (
@@ -112,14 +114,14 @@ export function MarketingLayout({ children }: { children: React.ReactNode }) {
                   </Button>
                 </>
               ))}
-          </nav>
+          </div>
           <button
             type="button"
             onClick={() => setMobileMenuOpen((open) => !open)}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-marketing-navigation"
             aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 md:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 lg:hidden"
           >
             <svg
               aria-hidden="true"
@@ -141,7 +143,7 @@ export function MarketingLayout({ children }: { children: React.ReactNode }) {
           id="mobile-marketing-navigation"
           aria-label="Mobile navigation"
           hidden={!mobileMenuOpen}
-          className="absolute inset-x-0 top-full border-b border-neutral-200 bg-white px-4 py-4 shadow-soft md:hidden"
+          className="absolute inset-x-0 top-full border-b border-neutral-200 bg-white px-4 py-4 shadow-soft lg:hidden"
         >
           <div className="container-content mx-auto flex flex-col gap-3">
             <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">

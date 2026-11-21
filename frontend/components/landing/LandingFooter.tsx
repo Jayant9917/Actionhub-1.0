@@ -55,6 +55,19 @@ export function LandingFooter() {
             </div>
           ))}
         </div>
+        <section
+          aria-labelledby="footer-team-note-heading"
+          className="mt-12 w-full max-w-none rounded-2xl border border-neutral-200 bg-neutral-50/30 p-5 shadow-soft sm:p-6"
+        >
+          <h2 id="footer-team-note-heading" className="text-body-sm font-semibold text-neutral-900">
+            A note from the team
+          </h2>
+          <p className="mt-3 text-body-sm leading-6 text-neutral-600">
+            ActionHub is built around a simple idea: workflows should quietly take care of repetitive
+            work, so teams can stay focused on what they&apos;re here to ship.
+          </p>
+          <p className="mt-4 text-body-sm font-medium text-neutral-900">The ActionHub team</p>
+        </section>
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-neutral-200 pt-8 sm:flex-row">
           <p className="text-body-sm text-neutral-500">
             © {new Date().getFullYear()} Automate. All rights reserved.

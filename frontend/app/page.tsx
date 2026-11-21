@@ -1,7 +1,6 @@
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
 import {
   HeroSection,
-  SocialProofSection,
   ProblemSection,
   HowItWorksSection,
   FeatureSection,
@@ -17,7 +16,6 @@ export default function Home() {
     <MarketingLayout>
       <main>
         <HeroSection />
-        <SocialProofSection />
         <ProblemSection />
         <HowItWorksSection />
         <FeatureSection />
