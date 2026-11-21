@@ -1,65 +1,41 @@
-"use client";
-
 import Link from "next/link";
 
-const FOOTER_LINKS = {
-  Product: [
-    { label: "Features", href: "#how-it-works" },
-    { label: "Integrations", href: "#" },
-    { label: "Pricing", href: "#" },
-  ],
-  Company: [
-    { label: "About", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Careers", href: "#" },
-  ],
-  Resources: [
-    { label: "Documentation", href: "#" },
-    { label: "Help center", href: "#" },
-    { label: "Contact", href: "#" },
-  ],
-  Legal: [
-    { label: "Privacy", href: "#" },
-    { label: "Terms", href: "#" },
-  ],
-};
+const footerLinks = [
+  { label: "Home", href: "/" },
+  { label: "How it works", href: "/#how-it-works" },
+  { label: "Integrations", href: "/#integrations" },
+  { label: "FAQ", href: "/#faq" },
+];
 
 export function LandingFooter() {
   return (
-    <footer className="border-t border-neutral-200 bg-white">
-      <div className="container-content py-16">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5">
-          <div className="lg:col-span-1">
-            <Link href="/" className="text-title font-semibold text-neutral-900">
-              Automate
-            </Link>
-            <p className="mt-3 text-body-sm text-neutral-500">
-              Workflow automation for modern teams.
-            </p>
-          </div>
-          {Object.entries(FOOTER_LINKS).map(([heading, links]) => (
-            <div key={heading}>
-              <h4 className="text-body-sm font-semibold text-neutral-900">{heading}</h4>
-              <ul className="mt-4 space-y-3">
-                {links.map(({ label, href }) => (
-                  <li key={label}>
-                    <Link
-                      href={href}
-                      className="text-body-sm text-neutral-500 transition-colors duration-fast hover:text-neutral-900"
-                    >
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-neutral-200 pt-8 sm:flex-row">
-          <p className="text-body-sm text-neutral-500">
-            © {new Date().getFullYear()} Automate. All rights reserved.
+    <footer className="border-t border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
+      <div className="container-content flex flex-col gap-5 py-7 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <Link
+            href="/"
+            className="text-sm font-semibold tracking-tight text-neutral-900 dark:text-neutral-900"
+          >
+            ActionHub
+          </Link>
+          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+            Workflows that move work forward.
           </p>
         </div>
+        <nav aria-label="Footer navigation" className="flex flex-wrap gap-x-5 gap-y-2">
+          {footerLinks.map(({ label, href }) => (
+            <Link
+              key={label}
+              href={href}
+              className="text-xs text-neutral-600 transition-colors hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 dark:focus-visible:ring-white"
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+          © {new Date().getFullYear()} ActionHub
+        </p>
       </div>
     </footer>
   );

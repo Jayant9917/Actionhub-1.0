@@ -1,12 +1,7 @@
 export { HeroSection } from "./HeroSection";
-export { SocialProofSection } from "./SocialProofSection";
-export { ProblemSection } from "./ProblemSection";
 export { HowItWorksSection } from "./HowItWorksSection";
-export { FeatureSection } from "./FeatureSection";
-export { BuilderPreviewSection } from "./BuilderPreviewSection";
+export { TaskHistorySection } from "./TaskHistorySection";
 export { IntegrationsSection } from "./IntegrationsSection";
-export { TestimonialsSection } from "./TestimonialsSection";
-export { PricingPreviewSection } from "./PricingPreviewSection";
+export { FAQSection } from "./FAQSection";
 export { FinalCTASection } from "./FinalCTASection";
 export { LandingFooter } from "./LandingFooter";
-export { FadeInSection } from "./FadeInSection";
