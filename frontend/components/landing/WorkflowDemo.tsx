@@ -108,7 +108,7 @@ export function WorkflowDemo() {
           <div className="flex items-center gap-2 text-sm font-semibold text-neutral-900 dark:text-neutral-900">
             <span className="flex size-7 items-center justify-center rounded-lg" style={{ backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }}><Zap size={15} aria-hidden="true" /></span>
             Workflow playground
-            <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">Sample data</span>
+            <span className="inline-flex shrink-0 whitespace-nowrap rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-medium leading-none uppercase tracking-wide text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">Sample data</span>
           </div>
           <p className="mt-1 pl-9 text-xs text-neutral-500">Choose a flow and watch ActionHub do the busywork.</p>
         </div>

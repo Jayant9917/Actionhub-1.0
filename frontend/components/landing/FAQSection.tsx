@@ -51,7 +51,7 @@ export function FAQSection() {
           <div>
             {FAQS.map(({ question, answer }) => (
               <details key={question} className="group border-t border-neutral-300 last:border-b">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-base font-medium focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-600 md:text-lg [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-sm font-medium focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-600 md:text-base [&::-webkit-details-marker]:hidden">
                   <span>{question}</span>
                   <span
                     aria-hidden="true"
