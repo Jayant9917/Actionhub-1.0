@@ -106,12 +106,23 @@ export function HowItWorksSection() {
                 }}
                 className="flex flex-col items-center rounded-2xl border border-neutral-200 bg-white p-6 text-center transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-[0_16px_40px_-24px_rgba(0,179,255,0.35)] dark:border-neutral-200 dark:bg-neutral-50"
               >
-                <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-50 text-brand-600 dark:border-neutral-200 dark:bg-neutral-100">
+                <motion.div
+                  initial={reduceMotion ? false : { scale: 0.82, rotate: -6 }}
+                  whileInView={{ scale: 1, rotate: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 260,
+                    damping: 16,
+                    delay: reduceMotion ? 0 : index * 0.1,
+                  }}
+                  className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-50 text-brand-600 dark:border-neutral-200 dark:bg-neutral-100"
+                >
                   <Icon className="h-7 w-7" aria-hidden="true" />
                   <span className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full border border-neutral-200 bg-white text-[10px] font-semibold text-neutral-600 dark:border-neutral-200 dark:bg-neutral-50 dark:text-neutral-900">
                     {step}
                   </span>
-                </div>
+                </motion.div>
                 <h3 className="mt-6 text-title text-neutral-900">{title}</h3>
                 <p className="mt-3 text-body text-neutral-600">{description}</p>
               </motion.div>
