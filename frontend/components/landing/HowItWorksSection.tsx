@@ -129,7 +129,7 @@ export function HowItWorksSection() {
     <FadeInSection>
       <section
         id="how-it-works"
-        className="section-padding relative isolate scroll-mt-20 overflow-hidden bg-white dark:bg-neutral-50"
+        className="section-padding relative isolate scroll-mt-20 overflow-hidden bg-white dark:bg-[#121212]"
       >
         <div
           aria-hidden="true"

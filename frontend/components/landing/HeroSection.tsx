@@ -9,7 +9,7 @@ export function HeroSection() {
   const router = useRouter();
 
   return (
-    <section className="relative overflow-hidden bg-white pb-14 pt-12 dark:bg-neutral-950 md:pb-20 md:pt-16">
+    <section className="relative overflow-hidden bg-white pb-14 pt-12 dark:bg-[#121212] md:pb-20 md:pt-16">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-[radial-gradient(ellipse_at_50%_0%,rgba(163,163,163,0.18),transparent_68%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.08),transparent_68%)]" />
       <div className="container-content relative">
         <div className="mx-auto max-w-4xl text-center">
