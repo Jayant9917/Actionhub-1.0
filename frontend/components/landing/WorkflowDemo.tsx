@@ -160,14 +160,14 @@ export function WorkflowDemo() {
                     y: isActive && !reduceMotion ? -2 : 0,
                   }}
                   transition={{ duration: reduceMotion ? 0 : 0.24 }}
-                  className="flex flex-1 items-center gap-3 rounded-xl border p-3 dark:bg-neutral-900/70"
+                  className="flex min-w-0 flex-1 items-center gap-3 rounded-xl border p-3 dark:bg-neutral-900/70"
                 >
                   <span className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${toneStyles[tone]}`}>
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-[10px] font-semibold tracking-[0.12em] text-neutral-400">{kind} · {app}</span>
-                    <span className="mt-1 block truncate text-sm font-semibold text-neutral-900 dark:text-neutral-900">{title}</span>
+                    <span className="mt-1 block min-w-0 whitespace-normal break-words text-sm font-semibold leading-5 text-neutral-900 dark:text-neutral-900">{title}</span>
                     {app === "Tally" ? (
                       <span className="mt-0.5 flex items-center gap-1 truncate text-xs text-neutral-500 dark:text-neutral-600">
                         <Webhook size={12} aria-hidden="true" /> Webhook · {detail}
