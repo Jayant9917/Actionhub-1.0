@@ -7,16 +7,16 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { FadeInSection } from "./FadeInSection";
 
 const SAMPLE_RESPONSE = [
-  { label: "Name", value: "Avery Chen" },
-  { label: "Email", value: "avery@acme.co" },
-  { label: "Message", value: "I’d love a dark mode for the mobile app." },
+  { label: "Issue", value: "#284 · bug" },
+  { label: "Title", value: "Keyboard shortcut stops working after refresh" },
+  { label: "Repository", value: "actionhub/web" },
 ];
 
 const STEPS = [
   {
     step: "1",
     title: "Pick a trigger",
-    description: "Start with a new response from Tally.",
+    description: "Start when an issue is opened in GitHub.",
     icon: TriggerIcon,
   },
   {
@@ -136,9 +136,9 @@ export function HowItWorksSection() {
           className="pointer-events-none absolute -right-16 top-1/4 -z-10 size-72 bg-[radial-gradient(circle,rgba(0,179,255,0.35)_1px,transparent_1.5px)] [background-size:7px_7px] opacity-30 [mask-image:radial-gradient(ellipse_at_center,#000,transparent_70%)] motion-safe:animate-pulse motion-reduce:animate-none"
         />
         <div className="container-content text-center">
-          <h2 className="section-heading">From form submission to team update</h2>
+          <h2 className="section-heading">From issue opened to team update</h2>
           <p className="section-subtext">
-            See how one Tally response updates a spreadsheet and notifies your team.
+            See how a GitHub issue gets logged and shared with your team.
           </p>
 
           <div
@@ -233,18 +233,18 @@ export function HowItWorksSection() {
                     <div className="mx-auto w-full max-w-3xl">
                       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
-                          <IntegrationMark src="/tally.svg" label="Tally" />
+                          <IntegrationMark src="/github.svg" label="GitHub" />
                           <div>
                             <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-900">
-                              New Tally response
+                              New GitHub issue
                             </h3>
                             <p className="text-xs text-neutral-500 dark:text-neutral-600">
-                              Product feedback form · just received
+                              actionhub/web · #284 · just opened
                             </p>
                           </div>
                         </div>
                         <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 dark:border-emerald-800 dark:bg-neutral-100 dark:text-emerald-400">
-                          Trigger received
+                          Issue opened
                         </span>
                       </div>
                       <div className="grid gap-2 sm:grid-cols-2">
@@ -257,7 +257,7 @@ export function HowItWorksSection() {
                               duration: transitionDuration,
                               delay: reduceMotion ? 0 : index * 0.07,
                             }}
-                            className={field.label === "Message" ? "sm:col-span-2" : ""}
+                            className={field.label === "Title" ? "sm:col-span-2" : ""}
                           >
                             <FieldChip {...field} />
                           </motion.div>
@@ -275,15 +275,15 @@ export function HowItWorksSection() {
                         className="rounded-2xl border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-200 dark:bg-neutral-100"
                       >
                         <div className="mb-2 flex items-center gap-2">
-                          <IntegrationMark src="/tally.svg" label="Tally" />
+                          <IntegrationMark src="/github.svg" label="GitHub" />
                           <p className="text-xs font-semibold text-neutral-900 dark:text-neutral-900">
-                            Tally response
+                            GitHub issue
                           </p>
                         </div>
                         <p className="text-xs leading-5 text-neutral-600 dark:text-neutral-600">
-                          {SAMPLE_RESPONSE[0].value} · {SAMPLE_RESPONSE[1].value}
+                          {SAMPLE_RESPONSE[0].value} · {SAMPLE_RESPONSE[2].value}
                           <br />
-                          {SAMPLE_RESPONSE[2].value}
+                          {SAMPLE_RESPONSE[1].value}
                         </p>
                       </motion.div>
                       <div aria-hidden="true" className="flex justify-center text-neutral-400">
@@ -301,7 +301,7 @@ export function HowItWorksSection() {
                         <div className="mb-3 flex items-center gap-2">
                           <IntegrationMark src="/sheets.png" label="Google Sheets" />
                           <p className="text-xs font-semibold text-neutral-900 dark:text-neutral-900">
-                            Google Sheets · Feedback
+                            Google Sheets · Issues
                           </p>
                         </div>
                         <div className="grid grid-cols-[0.7fr_1fr_1.2fr] overflow-hidden rounded-lg border border-neutral-200 text-[10px] dark:border-neutral-200 sm:text-[11px]">
@@ -358,8 +358,8 @@ export function HowItWorksSection() {
                           </div>
                         </div>
                         <p className="rounded-xl bg-neutral-50 px-3 py-2 text-xs leading-5 text-neutral-700 dark:bg-neutral-100 dark:text-neutral-700">
-                          New feedback from {SAMPLE_RESPONSE[0].value}: “I’d love a dark mode for
-                          the mobile app.”
+                          New issue {SAMPLE_RESPONSE[0].value} in {SAMPLE_RESPONSE[2].value}: “
+                          {SAMPLE_RESPONSE[1].value}.”
                         </p>
                       </motion.div>
                     </div>
@@ -384,11 +384,11 @@ export function HowItWorksSection() {
                         <div className="flex flex-wrap items-center justify-between gap-3 p-4">
                           <div className="flex min-w-0 items-center gap-3">
                             <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-neutral-50 text-neutral-700 dark:bg-neutral-100 dark:text-neutral-700">
-                              <Image src="/tally.svg" alt="" width={18} height={18} />
+                              <Image src="/github.svg" alt="" width={18} height={18} />
                             </span>
                             <div className="min-w-0 text-left">
                               <p className="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-900">
-                                Tally feedback → Sheets + Discord
+                                GitHub issue → Sheets + Discord
                               </p>
                               <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-600">
                                 Today, 10:42 AM · 2 actions
@@ -426,13 +426,13 @@ export function HowItWorksSection() {
                                 <div className="flex items-center gap-2 rounded-xl bg-neutral-50 p-3 dark:bg-neutral-100">
                                   <IntegrationMark src="/sheets.png" label="Google Sheets" />
                                   <p className="text-xs text-neutral-700 dark:text-neutral-700">
-                                    Added row 249 to Feedback
+                                    Added issue #284 to Issues
                                   </p>
                                 </div>
                                 <div className="flex items-center gap-2 rounded-xl bg-neutral-50 p-3 dark:bg-neutral-100">
                                   <IntegrationMark src="/discord.svg" label="Discord" />
                                   <p className="text-xs text-neutral-700 dark:text-neutral-700">
-                                    Posted to #product-feedback
+                                    Posted to #engineering
                                   </p>
                                 </div>
                               </div>

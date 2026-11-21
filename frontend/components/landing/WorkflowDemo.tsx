@@ -20,25 +20,25 @@ import { Button } from "@/components/ui/Button";
 
 const workflows = [
   {
-    id: "tally",
-    name: "Tally → Sheets + Discord",
-    steps: [
-      { app: "Tally", kind: "TRIGGER", title: "New form response", detail: "Product feedback · 2 min ago", Icon: ClipboardIcon, tone: "violet" },
-      { app: "Google Sheets", kind: "ACTION", title: "Add a spreadsheet row", detail: "Feedback tracker · Row 248", Icon: FileSpreadsheet, tone: "green" },
-      { app: "Discord", kind: "ACTION", title: "Send a channel message", detail: "#product-feedback · Sent", Icon: MessageCircle, tone: "indigo" },
-    ],
-    result: "Feedback saved to your tracker and shared with the team.",
-    sample: '“I’d love a dark mode for the mobile app.”',
-  },
-  {
-    id: "github",
-    name: "GitHub issue → Slack",
+    id: "github-opened",
+    name: "GitHub issue opened → Sheets + Discord",
     steps: [
       { app: "GitHub", kind: "TRIGGER", title: "Issue opened", detail: "actionhub/web · #284", Icon: GitBranch, tone: "slate" },
+      { app: "Google Sheets", kind: "ACTION", title: "Add a spreadsheet row", detail: "Issue tracker · Row 284", Icon: FileSpreadsheet, tone: "green" },
+      { app: "Discord", kind: "ACTION", title: "Send a channel message", detail: "#engineering · Sent", Icon: MessageCircle, tone: "indigo" },
+    ],
+    result: "New issue logged in your tracker and shared with the team.",
+    sample: "Keyboard shortcut stops working after refresh",
+  },
+  {
+    id: "github-assigned",
+    name: "GitHub issue assigned → Slack",
+    steps: [
+      { app: "GitHub", kind: "TRIGGER", title: "Issue assigned", detail: "actionhub/web · #284 → @priya", Icon: GitBranch, tone: "slate" },
       { app: "Slack", kind: "ACTION", title: "Post to a channel", detail: "#engineering · Sent", Icon: SlackMark, tone: "rose" },
     ],
-    result: "The new issue is on your team’s radar.",
-    sample: "Bug: keyboard shortcut stops working after refresh",
+    result: "The assigned issue is on your team’s radar.",
+    sample: "Issue #284 assigned to Priya",
   },
   {
     id: "schedule",
@@ -62,16 +62,12 @@ const toneStyles = {
   blue: "bg-sky-100 text-sky-700 dark:bg-sky-400/15 dark:text-sky-200",
 };
 
-function ClipboardIcon({ className }: { className?: string }) {
-  return <span className={`flex items-center justify-center rounded-md bg-violet-600 font-bold text-white ${className ?? ""}`} aria-hidden="true">T</span>;
-}
-
 function SlackMark({ className }: { className?: string }) {
   return <span className={`flex items-center justify-center rounded-md bg-rose-600 font-bold text-white ${className ?? ""}`} aria-hidden="true">S</span>;
 }
 
 export function WorkflowDemo() {
-  const [selectedId, setSelectedId] = useState<(typeof workflows)[number]["id"]>("tally");
+  const [selectedId, setSelectedId] = useState<(typeof workflows)[number]["id"]>("github-opened");
   const [status, setStatus] = useState<"idle" | "running" | "complete">("idle");
   const [activeStep, setActiveStep] = useState(-1);
   const reduceMotion = useReducedMotion();
@@ -168,13 +164,7 @@ export function WorkflowDemo() {
                   <span className="min-w-0 flex-1">
                     <span className="block text-[10px] font-semibold tracking-[0.12em] text-neutral-400">{kind} · {app}</span>
                     <span className="mt-1 block min-w-0 whitespace-normal break-words text-sm font-semibold leading-5 text-neutral-900 dark:text-neutral-900">{title}</span>
-                    {app === "Tally" ? (
-                      <span className="mt-0.5 flex items-center gap-1 truncate text-xs text-neutral-500 dark:text-neutral-600">
-                        <Webhook size={12} aria-hidden="true" /> Webhook · {detail}
-                      </span>
-                    ) : (
-                      <span className="mt-0.5 block truncate text-xs text-neutral-500 dark:text-neutral-400">{detail}</span>
-                    )}
+                    <span className="mt-0.5 block truncate text-xs text-neutral-500 dark:text-neutral-400">{detail}</span>
                   </span>
                   <span className="flex size-5 shrink-0 items-center justify-center">
                     {isDone ? <CircleCheck className="size-4 text-emerald-600 dark:text-emerald-400" aria-label="Completed" /> : isActive ? <span className="size-2 rounded-full bg-neutral-900 dark:bg-white" aria-label="Running" /> : null}
