@@ -24,9 +24,6 @@ export function IntegrationsSection() {
       <section className="section-padding border-t border-neutral-100 bg-neutral-50/50">
         <div className="container-content text-center">
           <h2 className="section-heading">Integrations that fit your stack</h2>
-          <p className="section-subtext">
-            Connect to the tools your team uses every day. New integrations added regularly.
-          </p>
           <div className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
             {APPS.map(({ name, slug }) => (
               <div
