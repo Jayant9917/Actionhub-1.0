@@ -409,6 +409,8 @@ No release roadmap is published. Previously listed follow-up areas include integ
 
 Open an issue for behavior changes or submit a pull request with a reproduction, the affected service, and verification results. For schema changes, update the migration history in `primary-backend/` and keep affected Prisma schema copies aligned. See [CONTRIBUTING.md](CONTRIBUTING.md) for the checks expected before opening a pull request.
 
+Participation in the project follows the [ActionHub Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## License
 
-The backend service manifests list ISC. A standalone repository license file is pending confirmation from the maintainers.
+ActionHub is released under the [MIT License](LICENSE).
