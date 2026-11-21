@@ -8,22 +8,26 @@ const FEATURES = [
     description:
       "Drag-and-drop workflow editor. Connect triggers and actions in minutes, not days.",
     icon: ZapIcon,
+    iconColors: "bg-amber-100 text-amber-600",
   },
   {
     title: "Powerful integrations",
     description:
       "Connect to the apps your team already uses. More integrations, fewer custom scripts.",
     icon: PuzzleIcon,
+    iconColors: "bg-sky-100 text-sky-600",
   },
   {
     title: "Runs in the background",
     description: "Set it once and forget it. Reliable execution with visibility when you need it.",
     icon: ShieldIcon,
+    iconColors: "bg-emerald-100 text-emerald-600",
   },
   {
     title: "Built for speed",
     description: "From idea to live automation in minutes. No deployment, no engineering handoff.",
     icon: BoltIcon,
+    iconColors: "bg-violet-100 text-violet-600",
   },
 ];
 
@@ -106,12 +110,12 @@ export function FeatureSection() {
             overhead.
           </p>
           <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map(({ title, description, icon: Icon }) => (
+            {FEATURES.map(({ title, description, icon: Icon, iconColors }) => (
               <div
                 key={title}
                 className="rounded-2xl border border-neutral-200 bg-white p-8 text-left transition-all duration-fast hover:border-neutral-300 hover:shadow-soft"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${iconColors}`}>
                   <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="mt-6 text-title-sm text-neutral-900">{title}</h3>
