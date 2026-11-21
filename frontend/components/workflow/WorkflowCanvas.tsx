@@ -107,6 +107,7 @@ type Props = {
   fixedTrigger?: boolean;
   savedWorkflow?: boolean;
   onTriggerClosed?: () => void;
+  triggerSetupControl?: ReactNode;
   renderTriggerSettings: (done: () => void) => ReactNode;
 };
 export function WorkflowCanvas({
@@ -123,6 +124,7 @@ export function WorkflowCanvas({
   savedWorkflow = false,
   onTriggerClosed,
   renderTriggerSettings,
+  triggerSetupControl,
 }: Props) {
   const [selection, setSelection] = useState<Selection>(null);
   const selectionRef = useRef(selection);
@@ -165,6 +167,15 @@ export function WorkflowCanvas({
     setChoosing(false);
     setTab("setup");
   }
+  function moveAction(key: string, target: number) {
+    onActionsChange((current) => {
+      const from = current.findIndex((action) => action.key === key);
+      if (from < 0 || target < 0 || target >= current.length || from === target) return current;
+      const next = [...current];
+      next.splice(target, 0, next.splice(from, 1)[0]);
+      return next;
+    });
+  }
   function addAction() {
     const action = { ...newAction("email", trigger), availableActionId: "", actionMetadata: {} };
     onActionsChange((current) => [...current, action]);
@@ -205,7 +216,21 @@ export function WorkflowCanvas({
             onClick={() => open({ kind: "trigger" }, !trigger)}
           />
           {actions.map((action, i) => (
-            <div key={action.key} className="flex flex-col items-center">
+            <div
+              key={action.key}
+              className="flex flex-col items-center"
+              onDragOver={(event) => {
+                if (event.dataTransfer.types.includes("application/x-actionhub-step"))
+                  event.preventDefault();
+              }}
+              onDrop={(event) => {
+                const key = event.dataTransfer.getData("application/x-actionhub-step");
+                if (key) {
+                  event.preventDefault();
+                  moveAction(key, i);
+                }
+              }}
+            >
               <WorkflowConnector />
               <WorkflowNode
                 index={i + 2}
@@ -215,6 +240,36 @@ export function WorkflowCanvas({
                 selected={selection?.kind === "action" && selection.key === action.key}
                 onClick={() => open({ kind: "action", key: action.key }, !action.availableActionId)}
               />
+              <div className="flex items-center gap-2 text-caption text-neutral-600">
+                <span
+                  draggable
+                  onDragStart={(event) => {
+                    event.dataTransfer.setData("application/x-actionhub-step", action.key);
+                    event.dataTransfer.effectAllowed = "move";
+                  }}
+                  className="cursor-grab px-2"
+                  title="Drag to reorder"
+                  aria-hidden="true"
+                >
+                  ⠿
+                </span>
+                <button
+                  type="button"
+                  disabled={i === 0}
+                  onClick={() => moveAction(action.key, i - 1)}
+                  className="disabled:opacity-40"
+                >
+                  Move up
+                </button>
+                <button
+                  type="button"
+                  disabled={i === actions.length - 1}
+                  onClick={() => moveAction(action.key, i + 1)}
+                  className="disabled:opacity-40"
+                >
+                  Move down
+                </button>
+              </div>
             </div>
           ))}
           <WorkflowConnector />
@@ -291,21 +346,6 @@ export function WorkflowCanvas({
                   </button>
                 ))}
             </div>
-            {selected && (
-              <div className="border-t border-neutral-100 pt-4">
-                <Button
-                  variant="ghostDanger"
-                  onClick={() => {
-                    onActionsChange((current) =>
-                      current.filter((action) => action.key !== selected.key),
-                    );
-                    close();
-                  }}
-                >
-                  Remove action
-                </Button>
-              </div>
-            )}
           </div>
         ) : (
           <div>
@@ -399,6 +439,7 @@ export function WorkflowCanvas({
                     message in Configure.
                   </p>
                 )}
+                {isTrigger && triggerSetupControl}
                 <div className="flex justify-end border-t border-neutral-100 pt-4">
                   <Button onClick={() => setTab("configure")}>Continue</Button>
                 </div>
@@ -431,17 +472,6 @@ export function WorkflowCanvas({
                           }}
                         />
                         <div className="flex items-center justify-between border-t border-neutral-200 pt-4">
-                          <Button
-                            variant="ghostDanger"
-                            onClick={() => {
-                              onActionsChange((current) =>
-                                current.filter((action) => action.key !== selected.key),
-                              );
-                              close();
-                            }}
-                          >
-                            Remove action
-                          </Button>
                           <Button type="submit">Done</Button>
                         </div>
                       </form>
@@ -475,6 +505,18 @@ export function WorkflowCanvas({
               </div>
             )}
           </div>
+        )}
+        {selected && (
+          <Button
+            className="mt-4"
+            variant="ghostDanger"
+            onClick={() => {
+              onActionsChange((current) => current.filter((action) => action.key !== selected.key));
+              close();
+            }}
+          >
+            Remove action
+          </Button>
         )}
       </Modal>
     </div>

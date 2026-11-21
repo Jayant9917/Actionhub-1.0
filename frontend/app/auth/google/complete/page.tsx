@@ -30,11 +30,10 @@ export default function GoogleLoginComplete() {
       active = false;
     };
   }, [router]);
+  if (!error) return <main className="min-h-screen bg-neutral-50" aria-busy="true" />;
   return (
     <main className="mx-auto max-w-md space-y-4 p-8">
-      <h1 className="text-title">
-        {error ? "Google sign-in could not finish" : "Signing you in..."}
-      </h1>
+      <h1 className="text-title">Google sign-in could not finish</h1>
       {error && (
         <p>
           Start Google sign-in again. Your existing account and workflows have not been changed.

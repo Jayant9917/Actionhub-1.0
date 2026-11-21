@@ -10,12 +10,15 @@ import { WorkflowCanvas } from "./WorkflowCanvas";
 import { TallyTriggerSetup } from "./TallyTriggerSetup";
 import { GitHubTriggerSetup } from "./GitHubTriggerSetup";
 import { TestEventPanel } from "./TestEventPanel";
+import { workflowName } from "@/lib/workflow-names";
 import { Button } from "@/components/ui/Button";
 export function WorkflowActionsPanel({
   workflowId,
   onSaved,
+  onActionsSaved,
 }: {
   workflowId: string;
+  onActionsSaved?: () => void;
   onSaved?: () => void;
 }) {
   const [actions, setActions] = useState<ActionDraft[]>([]);
@@ -84,6 +87,7 @@ export function WorkflowActionsPanel({
       setMessage("Actions saved. Changes apply to future events.");
       toast.success("Actions saved. Changes apply to future events.");
       onSaved?.();
+      onActionsSaved?.();
     } catch (failure) {
       setError(apiMessage(failure, "Could not save actions."));
     } finally {
@@ -106,8 +110,13 @@ export function WorkflowActionsPanel({
   return (
     <div>
       <WorkflowCanvas
-        title="Workflow"
+        title={workflowName(workflowId, "Workflow")}
         savedWorkflow
+        triggerSetupControl={
+          persistedTrigger === "schedule" ? (
+            <ScheduleSetup workflowId={workflowId} quick />
+          ) : undefined
+        }
         trigger={trigger}
         actions={actions}
         onTriggerChange={setTrigger}
@@ -179,6 +188,26 @@ export function WorkflowActionsPanel({
           )
         }
       />
+      <details className="container-content py-4 text-body-sm text-neutral-600">
+        <summary className="cursor-pointer">Technical details</summary>
+        <div className="mt-2 flex flex-wrap items-center gap-2 break-all">
+          <code>{workflowId}</code>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(workflowId);
+                toast.success("Workflow ID copied.");
+              } catch {
+                toast.error("Could not copy the workflow ID.");
+              }
+            }}
+          >
+            Copy ID
+          </Button>
+        </div>
+      </details>
       {error && (
         <div className="fixed bottom-5 left-1/2 z-10 -translate-x-1/2 rounded-xl border border-neutral-200 bg-white p-2 shadow-soft-md">
           <Button

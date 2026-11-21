@@ -19,14 +19,15 @@ async function setup() {
   await act(async () => {
     render(<Page />);
   });
-  fireEvent.click(screen.getByRole("button", { name: `Delete automation ${id}` }));
+  fireEvent.click(screen.getByText("More options"));
+  fireEvent.click(screen.getByRole("button", { name: "Delete automation 1" }));
 }
 test("requires confirmation and cancellation leaves the automation intact", async () => {
   await setup();
   expect(screen.getByRole("dialog")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
   expect(axios.delete).not.toHaveBeenCalled();
-  expect(screen.getByRole("button", { name: `Delete automation ${id}` })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Delete automation 1" })).toBeInTheDocument();
 });
 test("confirmed deletion removes the row after server success", async () => {
   await setup();
@@ -39,5 +40,5 @@ test("failed deletion keeps the row and shows an actionable error", async () => 
   await setup();
   fireEvent.click(screen.getByRole("button", { name: "Delete automation", exact: true }));
   await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Could not delete"));
-  expect(screen.getByRole("button", { name: `Delete automation ${id}` })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Delete automation 1" })).toBeInTheDocument();
 });

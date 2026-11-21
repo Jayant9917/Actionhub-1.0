@@ -69,7 +69,8 @@ export function TallyTriggerSetup({ workflowId }: { workflowId: string }) {
   const url = `${BACKEND_URL}/api/v1/zap/${encodeURIComponent(workflowId)}/tally-trigger`;
   useEffect(() => {
     let active = true;
-    setOrigin(window.location.origin);
+    const key = `actionhub.tallyPublicBase.${workflowId}`;
+    setOrigin(localStorage.getItem(key) || window.location.origin);
     axios
       .get(url, apiOptions())
       .then(({ data }) => {
@@ -85,7 +86,7 @@ export function TallyTriggerSetup({ workflowId }: { workflowId: string }) {
     return () => {
       active = false;
     };
-  }, [url]);
+  }, [url, workflowId]);
   useToastFeedback(error, message);
   async function save(event: React.FormEvent) {
     event.preventDefault();
@@ -131,7 +132,10 @@ export function TallyTriggerSetup({ workflowId }: { workflowId: string }) {
         label="Public base URL"
         type="url"
         value={origin}
-        onChange={(e) => setOrigin(e.target.value)}
+        onChange={(e) => {
+          setOrigin(e.target.value);
+          localStorage.setItem(`actionhub.tallyPublicBase.${workflowId}`, e.target.value);
+        }}
         hint="Paste your ngrok HTTPS origin to display the URL below."
       />
       <div>
@@ -141,7 +145,7 @@ export function TallyTriggerSetup({ workflowId }: { workflowId: string }) {
         </code>
       </div>
       <p className="text-body-sm text-neutral-500">
-        In your published Tally form: Integrations ? Webhooks ? Connect. Paste this URL and set the
+        In your published Tally form: Integrations → Webhooks → Connect. Paste this URL and set the
         matching signing secret.
       </p>
       {message && (

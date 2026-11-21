@@ -49,7 +49,7 @@ export function errorExplanation(code: string | null): string {
     CONNECTION_UNREADABLE:
       "The saved connection could not be decrypted. Check the server encryption key or replace the connection.",
     MISSING_EVENT_FIELD:
-      "A selected field is missing from this event. Check the field mappings for your trigger.",
+      "This action uses a field that is not in the event. Add it to the webhook JSON or change the action's field mapping.",
     INVALID_EVENT_FIELD:
       "A selected field contains an unsupported value. Choose a text, number or boolean field.",
     INVALID_TEMPLATE: "A field mapping is invalid. Edit the action and choose the field again.",

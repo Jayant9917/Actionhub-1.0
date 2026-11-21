@@ -57,7 +57,7 @@ test("the action connects its account in the same overlay and retains mapped fie
   expect(screen.getByRole("tab", { name: "setup" })).toHaveAttribute("aria-selected", "true");
   fireEvent.click(screen.getByRole("tab", { name: "configure" }));
   fireEvent.change(screen.getByLabelText("Slack message"), {
-    target: { value: "{{issue.title}}" },
+    target: { value: "{{issue.title}}{{name}}: {{message}}" },
   });
   fireEvent.click(screen.getByRole("button", { name: "Done" }));
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();

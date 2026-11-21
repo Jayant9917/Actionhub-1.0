@@ -150,3 +150,19 @@ Root `.env.docker` controls API authentication limits: `AUTH_LOGIN_WINDOW_MS=900
 `db-init` runs database migrations, then `npm run migrate:passwords`, then seed. On the first security upgrade, stop the old API before running this task. The password upgrade is resumable and does not change users' passwords; Google-only users are skipped. Both login methods now issue 12-hour sessions, and old non-expiring tokens are rejected.
 
 The API trusts exactly one private Nginx hop. Nginx overwrites forwarded client IPs. Keep API ports private and review this configuration before adding another proxy/load balancer. Local Docker NAT or tunnels can group users under one IP.
+
+## Browse your database with pgAdmin
+
+```powershell
+docker compose --env-file .env.docker up -d pgadmin
+```
+
+Open http://localhost:5050. Sign in with `PGADMIN_EMAIL` and `PGADMIN_PASSWORD` from your private root `.env.docker`. These are pgAdmin credentials, separate from ActionHub login. Set a strong password before first start. The initial account is persisted; changing the env later does not reset its password.
+
+The `ActionHub PostgreSQL` server is registered automatically. Expand it and enter database password `actionhub_dev` (the existing development database password in Compose). Connection: host `postgres`, port `5432`, username/database `actionhub`. Inside Docker, `localhost` refers to pgAdmin itself.
+
+Expand **Databases ? actionhub ? Schemas ? public ? Tables**. Right-click a table, then **View/Edit Data ? All Rows**. `User` holds accounts, `Zap` workflows, and run/action tables hold execution records. Viewing rows does not decrypt stored connection credentials or recover password hashes.
+
+pgAdmin is an optional `tools` profile, bound only to your PC. It has its own persistent settings volume and reuses the existing PostgreSQL database. No application image rebuild is needed. Stop it with `docker compose --env-file .env.docker stop pgadmin`. Normal app startup does not start this optional tool unless explicitly selected or `--profile tools` is used.
+
+Container configuration follows the [official pgAdmin documentation](https://www.pgadmin.org/docs/pgadmin4/9.17/container_deployment.html).

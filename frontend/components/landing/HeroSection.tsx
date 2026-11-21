@@ -7,7 +7,7 @@ export function HeroSection() {
   const router = useRouter();
 
   return (
-    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#f8fafc_0%,#f1f5f9_50%,#ffffff_100%)] pt-16 pb-24 md:pt-24 md:pb-32">
+    <section className="relative overflow-hidden bg-gradient-to-b from-neutral-50 via-neutral-100 to-neutral-50 pt-16 pb-24 md:pt-24 md:pb-32">
       <div className="container-content relative z-10">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-display-sm font-semibold tracking-tight text-neutral-900 md:text-display lg:text-[3.25rem] lg:leading-[1.15]">

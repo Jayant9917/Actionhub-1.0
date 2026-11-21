@@ -40,6 +40,7 @@ export function ConnectionManager({
 }) {
   const { connections, refresh, error: loadError } = useConnections();
   const [editing, setEditing] = useState<string | null>(null);
+  const [adding, setAdding] = useState(compact);
   const [provider, setProvider] = useState(providerFilter ?? "slack.webhook");
   const [name, setName] = useState("");
   const [secret, setSecret] = useState("");
@@ -83,7 +84,7 @@ export function ConnectionManager({
   async function revoke(id: string) {
     if (
       !window.confirm(
-        "Revoke this connection? Pending actions using it will fail until configured with an active connection.",
+        "Disconnect this app? Pending actions using it will fail until configured with an active connection.",
       )
     )
       return;
@@ -103,15 +104,10 @@ export function ConnectionManager({
   }
   const content = (
     <>
-      {(!providerFilter || providerFilter === "google.service_account") && (
+      {compact && (!providerFilter || providerFilter === "google.service_account") && (
         <GoogleSheetsConnect onConnected={(id) => void googleConnected(id)} />
       )}
-      {!compact && (
-        <CardHeader
-          title="Your connections"
-          subtitle="Save your webhook connections or connect Google Sheets. Credentials are private and are not displayed again."
-        />
-      )}
+      {!compact && <CardHeader title="Connected apps" />}
       {compact && (
         <p className="mb-5 text-body-sm text-neutral-500">
           Choose an account below or connect a new one. Your credentials stay private.
@@ -147,114 +143,138 @@ export function ConnectionManager({
                   )
                 </small>
               </span>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap items-start gap-2">
                 {onConnected && (
                   <Button size="sm" variant="secondary" onClick={() => onConnected(connection.id)}>
                     Use account
                   </Button>
                 )}
-                {connection.provider !== "google.oauth" && (
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setEditing(connection.id);
-                      setName(connection.name);
-                      setProvider(connection.provider);
-                      setSecret("");
-                      setMessage("");
-                    }}
-                  >
-                    Replace credentials
+                <details className="text-body-sm">
+                  <summary className="cursor-pointer">Manage</summary>
+                  {connection.provider !== "google.oauth" && (
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setEditing(connection.id);
+                        setName(connection.name);
+                        setProvider(connection.provider);
+                        setSecret("");
+                        setMessage("");
+                      }}
+                    >
+                      Replace credentials
+                    </Button>
+                  )}
+                  <Button variant="ghostDanger" onClick={() => void revoke(connection.id)}>
+                    Disconnect
                   </Button>
-                )}
-                <Button variant="ghostDanger" onClick={() => void revoke(connection.id)}>
-                  Revoke
-                </Button>
+                </details>
               </div>
             </li>
           ))}
       </ul>
-      <form onSubmit={save} className="space-y-4">
-        <h3 className="font-semibold">
-          {editing ? "Replace connection credentials" : "Add a connection"}
-        </h3>
-        <Input
-          id="connection-name"
-          label="Connection name"
-          required
-          maxLength={80}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="For example: Team alerts or My issue tracker"
-        />
-        <label className="block">
-          Provider
-          <select
-            aria-label="Connection provider"
-            disabled={!!editing || !!providerFilter}
-            className="block w-full rounded-xl border border-neutral-200 bg-white p-2.5 text-body"
-            value={provider}
-            onChange={(e) => {
-              setProvider(e.target.value);
-              setSecret("");
-            }}
-          >
-            <option value="http.headers">HTTP API headers</option>
-            <option value="discord.webhook">Discord incoming webhook</option>
-            <option value="slack.webhook">Slack incoming webhook</option>
-            <option value="google.service_account">Google Sheets service account</option>
-          </select>
-        </label>
-        <label htmlFor="connection-secret" className="block">
-          {provider === "http.headers"
-            ? "HTTP connection JSON"
-            : provider === "discord.webhook"
-              ? "Discord webhook URL"
-              : provider === "slack.webhook"
-                ? "Slack webhook URL"
-                : "Google service-account JSON"}
-        </label>
-        <textarea
-          id="connection-secret"
-          autoComplete="off"
-          spellCheck={false}
-          required
-          maxLength={30000}
-          rows={provider === "google.service_account" ? 6 : 2}
-          value={secret}
-          onChange={(e) => setSecret(e.target.value)}
-          className="w-full rounded-xl border p-3"
-        />
-        <p className="text-body-sm text-neutral-500">
-          {provider === "http.headers"
-            ? 'Enter an HTTPS origin and headers object, for example {"origin":"https://api.example.com","headers":{"Authorization":"Bearer YOUR_TOKEN"}}. Use empty headers {} for a public API. Credentials are sent only to this origin.'
-            : provider === "discord.webhook"
-              ? "Paste the webhook URL from your Discord text channel settings → Integrations → Webhooks. This is not a bot token."
-              : provider === "slack.webhook"
-                ? "Use the incoming webhook URL for the channel where you want messages. This is not a Slack bot token."
-                : "Paste the downloaded service-account JSON. Enable Sheets API and share your spreadsheet with its client_email as Editor. A Google API key alone is not sufficient."}
-        </p>
-        <Button type="submit" disabled={saving}>
-          {saving ? "Saving connection..." : "Save connection"}
+      {!compact && !editing && (
+        <Button variant="secondary" onClick={() => setAdding(!adding)}>
+          {adding ? "Cancel" : "Add connection"}
         </Button>
-        {editing && (
-          <Button
-            variant="ghost"
-            onClick={() => {
-              setEditing(null);
-              setSecret("");
-              setName("");
-            }}
-          >
-            Cancel replacement
-          </Button>
-        )}
-        {message && (
-          <p role="status" className="text-green-700">
-            {message}
-          </p>
-        )}
-      </form>
+      )}
+      {(adding || editing) && (
+        <form onSubmit={save} className="space-y-4">
+          <h3 className="font-semibold">
+            {editing ? "Replace connection credentials" : "Add a connection"}
+          </h3>
+          {provider !== "google.oauth" && (
+            <Input
+              id="connection-name"
+              label="Connection name"
+              required
+              maxLength={80}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="For example: Team alerts or My issue tracker"
+            />
+          )}
+          <label className="block">
+            Provider
+            <select
+              aria-label="Connection provider"
+              disabled={!!editing || !!providerFilter}
+              className="block w-full rounded-xl border border-neutral-200 bg-white p-2.5 text-body"
+              value={provider}
+              onChange={(e) => {
+                setProvider(e.target.value);
+                setSecret("");
+              }}
+            >
+              <option value="http.headers">HTTP API headers</option>
+              <option value="discord.webhook">Discord incoming webhook</option>
+              <option value="slack.webhook">Slack incoming webhook</option>
+              {!compact && <option value="google.oauth">Google Sheets</option>}
+              <option value="google.service_account">Google Sheets service account</option>
+            </select>
+          </label>
+          {provider === "google.oauth" ? (
+            <GoogleSheetsConnect
+              onConnected={(id) => {
+                setAdding(false);
+                void googleConnected(id);
+              }}
+            />
+          ) : (
+            <>
+              <label htmlFor="connection-secret" className="block">
+                {provider === "http.headers"
+                  ? "HTTP connection JSON"
+                  : provider === "discord.webhook"
+                    ? "Discord webhook URL"
+                    : provider === "slack.webhook"
+                      ? "Slack webhook URL"
+                      : "Google service-account JSON"}
+              </label>
+              <textarea
+                id="connection-secret"
+                autoComplete="off"
+                spellCheck={false}
+                required
+                maxLength={30000}
+                rows={provider === "google.service_account" ? 6 : 2}
+                value={secret}
+                onChange={(e) => setSecret(e.target.value)}
+                className="w-full rounded-xl border p-3"
+              />
+              <p className="text-body-sm text-neutral-500">
+                {provider === "http.headers"
+                  ? 'Enter an HTTPS origin and headers object, for example {"origin":"https://api.example.com","headers":{"Authorization":"Bearer YOUR_TOKEN"}}. Use empty headers {} for a public API. Credentials are sent only to this origin.'
+                  : provider === "discord.webhook"
+                    ? "Paste the webhook URL from your Discord text channel settings → Integrations → Webhooks. This is not a bot token."
+                    : provider === "slack.webhook"
+                      ? "Use the incoming webhook URL for the channel where you want messages. This is not a Slack bot token."
+                      : "Paste the downloaded service-account JSON. Enable Sheets API and share your spreadsheet with its client_email as Editor. A Google API key alone is not sufficient."}
+              </p>
+              <Button type="submit" disabled={saving}>
+                {saving ? "Saving connection..." : "Save connection"}
+              </Button>
+              {editing && (
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setEditing(null);
+                    setSecret("");
+                    setName("");
+                  }}
+                >
+                  Cancel replacement
+                </Button>
+              )}
+              {message && (
+                <p role="status" className="text-green-700">
+                  {message}
+                </p>
+              )}
+            </>
+          )}
+        </form>
+      )}
     </>
   );
   return compact ? <div>{content}</div> : <Card padding="lg">{content}</Card>;

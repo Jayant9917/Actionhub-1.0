@@ -3,7 +3,7 @@ import { toast, useToastFeedback } from "@/components/ui/toast";
 import { ScheduleFields, initialSchedule } from "@/components/workflow/ScheduleSetup";
 import { TallyFields } from "@/components/workflow/TallyTriggerSetup";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { BACKEND_URL } from "@/app/config";
@@ -22,6 +22,48 @@ export default function CreateAutomationPage() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   useToastFeedback(error);
+  const [draftReady, setDraftReady] = useState(false);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem("actionhub.workflowDraft") ?? "null");
+      if (saved) {
+        setTrigger(saved.trigger);
+        setSchedule(saved.schedule);
+        setActions(saved.actions);
+        setGithub({ ...saved.github, secret: "" });
+        setTally({ ...saved.tally, secret: "" });
+      }
+    } catch {
+      // An unavailable or invalid draft should not prevent creating a workflow.
+    }
+    setDraftReady(true);
+  }, []);
+  useEffect(() => {
+    if (!draftReady) return;
+    try {
+      sessionStorage.setItem(
+        "actionhub.workflowDraft",
+        JSON.stringify({
+          trigger,
+          schedule,
+          actions,
+          github: { repository: github.repository, enabled: github.enabled },
+          tally: { formId: tally.formId, enabled: tally.enabled },
+        }),
+      );
+    } catch {
+      // The workflow can still be published if browser storage is unavailable.
+    }
+  }, [
+    draftReady,
+    trigger,
+    schedule,
+    actions,
+    github.repository,
+    github.enabled,
+    tally.formId,
+    tally.enabled,
+  ]);
   async function publish() {
     setError("");
     if (
@@ -47,8 +89,11 @@ export default function CreateAutomationPage() {
         },
         apiOptions(),
       );
-      setTally({ formId: "", secret: "", enabled: true });
-      setGithub({ repository: "", secret: "", enabled: true });
+      try {
+        sessionStorage.removeItem("actionhub.workflowDraft");
+      } catch {
+        // Publishing already succeeded.
+      }
       toast.success("Automation published. It is ready to receive events.");
       router.push(`/zap/${data.zapId}`);
     } catch (failure) {

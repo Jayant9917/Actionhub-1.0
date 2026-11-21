@@ -28,7 +28,9 @@ test("users can edit dynamic email fields and insert an event mapping", () => {
   fireEvent.change(screen.getByLabelText("Insert event field into first-subject"), {
     target: { value: "issue.number" },
   });
-  fireEvent.change(screen.getByLabelText("Email body"), { target: { value: "{{issue.title}}" } });
+  fireEvent.change(screen.getByLabelText("Email body"), {
+    target: { value: "{{issue.title}}{{issue.title}}\n{{issue.html_url}}" },
+  });
   expect(payload()[0]).toMatchObject({
     availableActionId: "email",
     credentialId: null,
@@ -57,7 +59,9 @@ test("Slack selection offers only Slack connections and saves a message", () => 
   expect(within(select).queryByText("My sheet")).not.toBeInTheDocument();
   fireEvent.change(select, { target: { value: "slack" } });
   fireEvent.change(screen.getByLabelText("Slack message"), {
-    target: { value: "{{issue.title}}" },
+    target: {
+      value: "{{issue.title}}{{repository.full_name}}: {{issue.title}}\n{{issue.html_url}}",
+    },
   });
   expect(payload()[0]).toMatchObject({
     credentialId: "slack",

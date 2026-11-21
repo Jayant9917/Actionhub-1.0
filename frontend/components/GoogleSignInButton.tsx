@@ -10,6 +10,7 @@ export function GoogleSignInButton({ purpose = "login" }: { purpose?: "login" | 
   const [enabled, setEnabled] = useState(false),
     [busy, setBusy] = useState(false),
     [loaded, setLoaded] = useState(false);
+  const [linkRequired, setLinkRequired] = useState(false);
   useEffect(() => {
     let active = true;
     axios
@@ -24,10 +25,7 @@ export function GoogleSignInButton({ purpose = "login" }: { purpose?: "login" | 
         if (active) setLoaded(true);
       });
     const result = new URLSearchParams(window.location.search).get("google");
-    if (result === "link_required")
-      toast.error(
-        "An account already exists with this email. Sign in with your password, then use Link Google sign-in in Settings.",
-      );
+    if (result === "link_required") setLinkRequired(true);
     else if (result === "linked")
       toast.success("Google sign-in is linked to your existing ActionHub account.");
     else if (result === "denied") toast.error("Google authorization was cancelled.");
@@ -52,6 +50,16 @@ export function GoogleSignInButton({ purpose = "login" }: { purpose?: "login" | 
   }
   return (
     <div className="mt-5 space-y-2">
+      {linkRequired && purpose === "login" && (
+        <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-body-sm text-neutral-800">
+          <p className="font-semibold">Link Google to your existing account</p>
+          <p className="mt-2">
+            An ActionHub account already uses this email. Log in below with your email and
+            password, then open Settings and choose Link Google sign-in. Select the same
+            Google account to finish linking. After that, you can use Continue with Google.
+          </p>
+        </div>
+      )}
       <Button
         variant="secondary"
         className="w-full"

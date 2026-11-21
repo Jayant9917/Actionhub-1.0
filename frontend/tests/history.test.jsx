@@ -42,7 +42,7 @@ test("shows safe history and independent action details in the existing overlay"
   await setup();
   expect(screen.getByRole("heading", { name: "Task history" })).toBeInTheDocument();
   expect(screen.getByText("Discord message")).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: `View run ${runId}` }));
+  fireEvent.click(screen.getByRole("button", { name: /View details for/ }));
   const dialog = await screen.findByRole("dialog");
   await within(dialog).findByText("1. Discord message");
   expect(
@@ -56,31 +56,16 @@ test("shows safe history and independent action details in the existing overlay"
   fireEvent.keyDown(document, { key: "Escape" });
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
-test("applies workflow/status/date filters on the API and clears them", async () => {
+test("applies workflow and status filters immediately and resets them from the dropdowns", async () => {
   await setup();
   fireEvent.change(screen.getByLabelText("Workflow"), { target: { value: workflowId } });
   fireEvent.change(screen.getByLabelText("Status"), { target: { value: "failed" } });
-  fireEvent.change(screen.getByLabelText("From date"), { target: { value: "2026-11-01" } });
-  fireEvent.change(screen.getByLabelText("To date"), { target: { value: "2026-11-14" } });
-  fireEvent.click(screen.getByRole("button", { name: "Apply filters" }));
-  await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(2));
-  expect(axios.get.mock.calls[1][1].params).toMatchObject({
-    workflowId,
-    status: "failed",
-    from: new Date("2026-11-01T00:00:00").toISOString(),
-    to: new Date("2026-11-14T23:59:59.999").toISOString(),
-  });
-  fireEvent.click(screen.getByRole("button", { name: "Clear" }));
-  await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(3));
-  expect(axios.get.mock.calls[2][1].params).toEqual({});
-});
-test("validates inverted dates without a request", async () => {
-  await setup();
-  fireEvent.change(screen.getByLabelText("From date"), { target: { value: "2026-11-15" } });
-  fireEvent.change(screen.getByLabelText("To date"), { target: { value: "2026-11-14" } });
-  fireEvent.click(screen.getByRole("button", { name: "Apply filters" }));
-  expect(screen.getByRole("alert")).toHaveTextContent("valid date range");
-  expect(axios.get).toHaveBeenCalledTimes(1);
+  await waitFor(() =>
+    expect(axios.get.mock.lastCall[1].params).toEqual({ workflowId, status: "failed" }),
+  );
+  fireEvent.change(screen.getByLabelText("Workflow"), { target: { value: "" } });
+  fireEvent.change(screen.getByLabelText("Status"), { target: { value: "" } });
+  await waitFor(() => expect(axios.get.mock.lastCall[1].params).toEqual({}));
 });
 test("loads more without duplicating runs and refresh resets pagination", async () => {
   axios.get
@@ -89,12 +74,14 @@ test("loads more without duplicating runs and refresh resets pagination", async 
     .mockResolvedValue(page([run]));
   await setup();
   fireEvent.click(screen.getByRole("button", { name: "Load more" }));
-  await screen.findByRole("button", { name: "View run second" });
-  expect(screen.getAllByRole("button", { name: /View run/ })).toHaveLength(2);
+  await waitFor(() =>
+    expect(screen.getAllByRole("button", { name: /View details for/ })).toHaveLength(2),
+  );
+  expect(screen.getAllByRole("button", { name: /View details for/ })).toHaveLength(2);
   expect(axios.get.mock.calls[1][1].params.cursor).toBe("next-page");
   fireEvent.click(screen.getByRole("button", { name: "Refresh history" }));
   await waitFor(() =>
-    expect(screen.queryByRole("button", { name: "View run second" })).not.toBeInTheDocument(),
+    expect(screen.getAllByRole("button", { name: /View details for/ })).toHaveLength(1),
   );
 });
 test("distinguishes no runs from no filter matches", async () => {
@@ -102,7 +89,6 @@ test("distinguishes no runs from no filter matches", async () => {
   await setup();
   expect(screen.getByText("No runs yet")).toBeInTheDocument();
   fireEvent.change(screen.getByLabelText("Status"), { target: { value: "failed" } });
-  fireEvent.click(screen.getByRole("button", { name: "Apply filters" }));
   await screen.findByText("No matching runs");
 });
 test("list failure is visible and retry recovers", async () => {
@@ -110,12 +96,12 @@ test("list failure is visible and retry recovers", async () => {
   await setup();
   expect(screen.getByRole("alert")).toHaveTextContent("Could not load task history");
   fireEvent.click(screen.getByRole("button", { name: "Retry history" }));
-  await screen.findByRole("button", { name: `View run ${runId}` });
+  await screen.findByRole("button", { name: /View details for/ });
 });
 test("detail errors can be retried and retry schedule is displayed", async () => {
   await setup();
   axios.get.mockRejectedValueOnce({ response: { data: { message: "Run not found" } } });
-  fireEvent.click(screen.getByRole("button", { name: `View run ${runId}` }));
+  fireEvent.click(screen.getByRole("button", { name: /View details for/ }));
   await screen.findByText("Run not found");
   axios.get.mockResolvedValue({
     data: {
@@ -141,7 +127,7 @@ test("older runs show an honest lack of action records", async () => {
     ),
   );
   await setup();
-  fireEvent.click(screen.getByRole("button", { name: `View run ${runId}` }));
+  fireEvent.click(screen.getByRole("button", { name: /View details for/ }));
   await screen.findByText(/Older runs may predate/);
 });
 test("ignores a slow stale filter response", async () => {
@@ -157,13 +143,12 @@ test("ignores a slow stale filter response", async () => {
     .mockResolvedValue(page([]));
   fireEvent.click(screen.getByRole("button", { name: "Refresh history" }));
   fireEvent.change(screen.getByLabelText("Status"), { target: { value: "failed" } });
-  fireEvent.click(screen.getByRole("button", { name: "Apply filters" }));
   await screen.findByText("No matching runs");
   await act(async () => {
     finish(page());
   });
   expect(screen.getByText("No matching runs")).toBeInTheDocument();
-  expect(screen.queryByRole("button", { name: `View run ${runId}` })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: /View details for/ })).not.toBeInTheDocument();
 });
 test.each([
   "CONNECTION_REQUIRED",

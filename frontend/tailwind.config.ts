@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -10,28 +11,28 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          50: "#eef2ff",
-          100: "#e0e7ff",
-          200: "#c7d2fe",
-          300: "#a5b4fc",
-          400: "#818cf8",
-          500: "#6366f1",
-          600: "#4f46e5",
-          700: "#4338ca",
-          800: "#3730a3",
-          900: "#312e81",
+          50: "#f5f5f5",
+          100: "#e5e5e5",
+          200: "#d4d4d4",
+          300: "#a3a3a3",
+          400: "#737373",
+          500: "#525252",
+          600: "#262626",
+          700: "#171717",
+          800: "#111111",
+          900: "#0a0a0a",
         },
         neutral: {
-          50: "#f8fafc",
-          100: "#f1f5f9",
-          200: "#e2e8f0",
-          300: "#cbd5e1",
-          400: "#94a3b8",
-          500: "#64748b",
-          600: "#475569",
-          700: "#334155",
-          800: "#1e293b",
-          900: "#0f172a",
+          50: "rgb(var(--neutral-50) / <alpha-value>)",
+          100: "rgb(var(--neutral-100) / <alpha-value>)",
+          200: "rgb(var(--neutral-200) / <alpha-value>)",
+          300: "rgb(var(--neutral-300) / <alpha-value>)",
+          400: "rgb(var(--neutral-400) / <alpha-value>)",
+          500: "rgb(var(--neutral-500) / <alpha-value>)",
+          600: "rgb(var(--neutral-600) / <alpha-value>)",
+          700: "rgb(var(--neutral-700) / <alpha-value>)",
+          800: "rgb(var(--neutral-800) / <alpha-value>)",
+          900: "rgb(var(--neutral-900) / <alpha-value>)",
         },
       },
       fontSize: {

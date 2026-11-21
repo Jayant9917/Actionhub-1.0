@@ -46,7 +46,9 @@ export function GitHubTriggerSetup({
 
   useEffect(() => {
     let active = true;
-    setPublicBase(window.location.origin);
+    setPublicBase(
+      localStorage.getItem(`actionhub.githubPublicBase.${workflowId}`) || window.location.origin,
+    );
     setConnection(null);
     setError("");
     axios
@@ -66,7 +68,7 @@ export function GitHubTriggerSetup({
     return () => {
       active = false;
     };
-  }, [url]);
+  }, [url, workflowId]);
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -158,7 +160,10 @@ export function GitHubTriggerSetup({
             type="url"
             value={publicBase}
             placeholder="https://your-address.ngrok-free.dev"
-            onChange={(event) => setPublicBase(event.target.value)}
+            onChange={(event) => {
+              setPublicBase(event.target.value);
+              localStorage.setItem(`actionhub.githubPublicBase.${workflowId}`, event.target.value);
+            }}
             hint="Paste your ngrok HTTPS origin here to display the public webhook URL. This field does not change the server configuration."
           />
           <div className="text-body-sm">

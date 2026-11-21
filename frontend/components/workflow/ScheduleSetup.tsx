@@ -109,7 +109,13 @@ export function ScheduleFields({
     </div>
   );
 }
-export function ScheduleSetup({ workflowId }: { workflowId: string }) {
+export function ScheduleSetup({
+  workflowId,
+  quick = false,
+}: {
+  workflowId: string;
+  quick?: boolean;
+}) {
   const [draft, setDraft] = useState(initialSchedule),
     [next, setNext] = useState(""),
     [loaded, setLoaded] = useState(false),
@@ -143,7 +149,7 @@ export function ScheduleSetup({ workflowId }: { workflowId: string }) {
       active = false;
     };
   }, [url]);
-  async function save() {
+  async function save(nextDraft = draft) {
     if (
       draft.frequency === "custom_interval" &&
       (!Number.isInteger(draft.intervalMinutes) ||
@@ -157,10 +163,11 @@ export function ScheduleSetup({ workflowId }: { workflowId: string }) {
     setError("");
     setMessage("");
     try {
-      const { data } = await axios.put(url, draft, apiOptions());
+      const { data } = await axios.put(url, nextDraft, apiOptions());
+      setDraft(nextDraft);
       setNext(data.schedule.nextRunAt);
       setMessage(
-        draft.enabled
+        nextDraft.enabled
           ? "Schedule saved. Future runs use this timing."
           : "Schedule paused. Runs already started may finish.",
       );
@@ -171,6 +178,22 @@ export function ScheduleSetup({ workflowId }: { workflowId: string }) {
     }
   }
   if (!loaded) return <p>{error || "Loading schedule..."}</p>;
+  if (quick)
+    return (
+      <div className="space-y-2">
+        <p className="text-body-sm">Schedule: {draft.enabled ? "Active" : "Paused"}</p>
+        <Button
+          variant="secondary"
+          disabled={saving}
+          onClick={() => void save({ ...draft, enabled: !draft.enabled })}
+        >
+          {saving ? "Saving..." : draft.enabled ? "Pause schedule" : "Resume schedule"}
+        </Button>
+        {!draft.enabled && (
+          <p className="text-caption text-neutral-500">Runs already started may finish.</p>
+        )}
+      </div>
+    );
   return (
     <div className="space-y-5">
       <ScheduleFields value={draft} onChange={setDraft} />

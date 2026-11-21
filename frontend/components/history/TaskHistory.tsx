@@ -1,4 +1,5 @@
 "use client";
+import { workflowName } from "@/lib/workflow-names";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
@@ -6,11 +7,11 @@ import { BACKEND_URL } from "@/app/config";
 import { apiOptions, apiMessage, actionNames } from "@/lib/actions";
 import { statusLabels, errorExplanation } from "@/lib/history";
 import type { Run, WorkflowOption } from "@/lib/history";
+import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
-const emptyFilters = { workflowId: "", status: "", from: "", to: "" };
+const emptyFilters = { workflowId: "", status: "" };
 function Status({ value }: { value: string }) {
   const color =
     value === "succeeded"
@@ -29,21 +30,72 @@ function Status({ value }: { value: string }) {
 function Time({ value }: { value: string }) {
   return <time dateTime={value}>{new Date(value).toLocaleString()}</time>;
 }
+function TechnicalDetails({ items }: { items: [string, string][] }) {
+  const [result, setResult] = useState("");
+  return (
+    <details className="text-body-sm text-neutral-600">
+      <summary className="cursor-pointer">Technical details</summary>
+      {items.map(([label, id]) => (
+        <div key={label} className="mt-2 break-all">
+          {label}: <code>{id}</code>{" "}
+          <Button
+            size="sm"
+            variant="ghost"
+            aria-label={`Copy ${label}`}
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(id);
+                setResult("Copied.");
+              } catch {
+                setResult("Could not copy. Select the ID to copy it manually.");
+              }
+            }}
+          >
+            Copy ID
+          </Button>
+        </div>
+      ))}
+      <p role="status">{result}</p>
+    </details>
+  );
+}
+
 export function TaskHistory() {
-  const [draft, setDraft] = useState(emptyFilters),
-    [filters, setFilters] = useState(emptyFilters);
+  const [filters, setFilters] = useState(emptyFilters);
   const [runs, setRuns] = useState<Run[]>([]),
     [workflows, setWorkflows] = useState<WorkflowOption[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null),
     [loading, setLoading] = useState(true),
-    [error, setError] = useState(""),
-    [validation, setValidation] = useState("");
+    [error, setError] = useState("");
   const [selected, setSelected] = useState<string | null>(null),
     [detail, setDetail] = useState<Run | null>(null),
     [detailError, setDetailError] = useState(""),
     [detailLoading, setDetailLoading] = useState(false);
   const listRequest = useRef(0),
     detailRequest = useRef(0);
+  const notifiedFailures = useRef(new Set<string>());
+  const notifyActionFailures = useCallback((run: Run) => {
+    const newFailures = run.actionRuns.filter((action) => {
+      if (!["failed", "needs_attention"].includes(action.status)) return false;
+      const key = `${run.id}:${action.id}:${action.errorCode ?? action.status}`;
+      if (notifiedFailures.current.has(key)) return false;
+      notifiedFailures.current.add(key);
+      return true;
+    });
+    if (newFailures.length) {
+      toast.error(
+        newFailures
+          .map(
+            (action) =>
+              `${actionNames[action.type] ?? "Action"}: ${
+                errorExplanation(action.errorCode) ||
+                "This action failed. Open execution details for more information."
+              }`,
+          )
+          .join("\n"),
+      );
+    }
+  }, []);
   const [liveError, setLiveError] = useState(false);
   const live = useRef({ runs, detail, selected, loading, detailLoading });
   live.current = { runs, detail, selected, loading, detailLoading };
@@ -74,8 +126,6 @@ export function TaskHistory() {
       const params: Record<string, string> = {};
       if (filters.workflowId) params.workflowId = filters.workflowId;
       if (filters.status) params.status = filters.status;
-      if (filters.from) params.from = new Date(`${filters.from}T00:00:00`).toISOString();
-      if (filters.to) params.to = new Date(`${filters.to}T23:59:59.999`).toISOString();
       if (cursor) params.cursor = cursor;
       try {
         const { data } = await axios.get(`${BACKEND_URL}/api/v1/runs`, { ...apiOptions(), params });
@@ -119,6 +169,7 @@ export function TaskHistory() {
         );
         if (request === detailRequest.current) {
           setDetail(data.run);
+          notifyActionFailures(data.run);
           mergeRun(data.run);
         }
       } catch (failure) {
@@ -128,7 +179,7 @@ export function TaskHistory() {
         if (request === detailRequest.current) setDetailLoading(false);
       }
     },
-    [mergeRun],
+    [mergeRun, notifyActionFailures],
   );
   const cancelDetail = useCallback(() => {
     detailRequest.current++;
@@ -179,6 +230,7 @@ export function TaskHistory() {
       for (const result of results)
         if (result.status === "fulfilled") {
           const updated = result.value.data.run as Run;
+          notifyActionFailures(updated);
           mergeRun(updated);
           setDetail((current) => (current?.id === updated.id ? updated : current));
         }
@@ -193,20 +245,15 @@ export function TaskHistory() {
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [mergeRun]);
-  function apply(event: React.FormEvent) {
-    event.preventDefault();
-    setValidation("");
-    if (
-      (draft.from && Number.isNaN(Date.parse(draft.from))) ||
-      (draft.to && Number.isNaN(Date.parse(draft.to))) ||
-      (draft.from && draft.to && draft.from > draft.to)
-    ) {
-      setValidation("Choose a valid date range with the start before the end.");
-      return;
-    }
-    setFilters({ ...draft });
-  }
+  }, [mergeRun, notifyActionFailures]);
+  const readableName = (id: string, trigger: string) => {
+    const matches = workflows.filter(
+      (workflow) => (workflow.trigger?.type.name ?? "Workflow") === trigger,
+    );
+    const index = matches.findIndex((workflow) => workflow.id === id);
+    return workflowName(id, index >= 0 && matches.length > 1 ? `${trigger} ${index + 1}` : trigger);
+  };
+
   return (
     <div className="container-content py-8">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
@@ -220,22 +267,19 @@ export function TaskHistory() {
           Refresh history
         </Button>
       </div>
-      <form
-        onSubmit={apply}
-        className="mb-6 grid items-end gap-4 rounded-2xl border border-neutral-200 bg-white p-5 sm:grid-cols-2 xl:grid-cols-5"
-      >
+      <div className="mb-6 grid max-w-xl gap-3 sm:grid-cols-2">
         <label className="text-body-sm font-medium text-neutral-700">
           Workflow
           <select
             aria-label="Workflow"
             className="mt-1.5 block w-full rounded-xl border border-neutral-200 bg-white p-2.5 text-body"
-            value={draft.workflowId}
-            onChange={(e) => setDraft({ ...draft, workflowId: e.target.value })}
+            value={filters.workflowId}
+            onChange={(e) => setFilters({ ...filters, workflowId: e.target.value })}
           >
             <option value="">All workflows</option>
             {workflows.map((workflow) => (
               <option key={workflow.id} value={workflow.id}>
-                {workflow.trigger?.type.name ?? "Workflow"} � {workflow.id.slice(0, 8)}
+                {readableName(workflow.id, workflow.trigger?.type.name ?? "Workflow")}
               </option>
             ))}
           </select>
@@ -245,8 +289,8 @@ export function TaskHistory() {
           <select
             aria-label="Status"
             className="mt-1.5 block w-full rounded-xl border border-neutral-200 bg-white p-2.5 text-body"
-            value={draft.status}
-            onChange={(e) => setDraft({ ...draft, status: e.target.value })}
+            value={filters.status}
+            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
           >
             <option value="">All statuses</option>
             {Object.entries(statusLabels)
@@ -258,40 +302,10 @@ export function TaskHistory() {
               ))}
           </select>
         </label>
-        <Input
-          label="From date"
-          type="date"
-          value={draft.from}
-          onChange={(e) => setDraft({ ...draft, from: e.target.value })}
-        />
-        <Input
-          label="To date"
-          type="date"
-          value={draft.to}
-          onChange={(e) => setDraft({ ...draft, to: e.target.value })}
-        />
-        <div className="flex gap-2">
-          <Button type="submit">Apply filters</Button>
-          <Button
-            variant="ghost"
-            onClick={() => {
-              setDraft(emptyFilters);
-              setFilters({ ...emptyFilters });
-              setValidation("");
-            }}
-          >
-            Clear
-          </Button>
-        </div>
-      </form>
+      </div>
       {liveError && (
         <p role="status" className="mb-4 text-body-sm text-amber-800">
           Live updates are temporarily unavailable. Showing the last known status.
-        </p>
-      )}
-      {validation && (
-        <p role="alert" className="mb-4 text-red-600">
-          {validation}
         </p>
       )}
       {error && (
@@ -315,7 +329,7 @@ export function TaskHistory() {
           title={Object.values(filters).some(Boolean) ? "No matching runs" : "No runs yet"}
           description={
             Object.values(filters).some(Boolean)
-              ? "Try a different workflow, status or date range."
+              ? "Try a different workflow or status."
               : "When an automation runs, its history will appear here."
           }
         />
@@ -340,10 +354,7 @@ export function TaskHistory() {
                 <tr key={run.id} className="hover:bg-neutral-50/60">
                   <td className="px-5 py-4">
                     <p className="font-medium text-neutral-900">
-                      {run.zap.trigger?.type.name ?? "Workflow"}
-                    </p>
-                    <p className="mt-1 text-caption text-neutral-500">
-                      {run.zapId.slice(0, 8)} � Run {run.id.slice(0, 8)}
+                      {readableName(run.zapId, run.zap.trigger?.type.name ?? "Workflow")}
                     </p>
                   </td>
                   <td className="whitespace-nowrap px-5 py-4">
@@ -367,7 +378,7 @@ export function TaskHistory() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      aria-label={`View run ${run.id}`}
+                      aria-label={`View details for ${readableName(run.zapId, run.zap.trigger?.type.name ?? "Workflow")}`}
                       onClick={() => setSelected(run.id)}
                     >
                       View details
@@ -409,10 +420,17 @@ export function TaskHistory() {
           <div className="space-y-5">
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-title-sm">{detail.zap.trigger?.type.name ?? "Workflow"}</h3>
+                <h3 className="text-title-sm">
+                  {readableName(detail.zapId, detail.zap.trigger?.type.name ?? "Workflow")}
+                </h3>
                 <Status value={detail.status} />
               </div>
-              <p className="break-all text-caption text-neutral-500">Run {detail.id}</p>
+              <TechnicalDetails
+                items={[
+                  ["Workflow ID", detail.zapId],
+                  ["Run ID", detail.id],
+                ]}
+              />
               <p className="text-body-sm">
                 Created: <Time value={detail.createdAt} />
               </p>
@@ -489,9 +507,7 @@ export function TaskHistory() {
                     </p>
                   </div>
                 )}
-                <p className="break-all text-caption text-neutral-400">
-                  Action execution: {action.id}
-                </p>
+                <TechnicalDetails items={[["Action execution ID", action.id]]} />
               </section>
             ))}
           </div>

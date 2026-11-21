@@ -22,6 +22,7 @@ const submit = () =>
 test("saves a user's Slack connection and clears plaintext from the form", async () => {
   const changed = jest.fn();
   render(<ConnectionManager onChanged={changed} />);
+  fireEvent.click(screen.getByRole("button", { name: "Add connection" }));
   fireEvent.change(screen.getByLabelText("Connection name"), { target: { value: "Team alerts" } });
   fireEvent.change(screen.getByLabelText("Slack webhook URL"), {
     target: { value: "https://hooks.slack.com/services/T/B/secret" },
@@ -42,6 +43,7 @@ test("saves a user's Slack connection and clears plaintext from the form", async
 });
 test("Google connections accept downloaded JSON instead of global env settings", async () => {
   await show();
+  fireEvent.click(screen.getByRole("button", { name: "Add connection" }));
   fireEvent.change(screen.getByLabelText("Connection provider"), {
     target: { value: "google.service_account" },
   });
@@ -62,6 +64,7 @@ test("Google connections accept downloaded JSON instead of global env settings",
 });
 test("invalid JSON never leaves the browser", async () => {
   await show();
+  fireEvent.click(screen.getByRole("button", { name: "Add connection" }));
   fireEvent.change(screen.getByLabelText("Connection provider"), {
     target: { value: "google.service_account" },
   });
@@ -75,6 +78,8 @@ test("invalid JSON never leaves the browser", async () => {
 test("loads safe names, replaces only the selected connection, and supports cancelling", async () => {
   await show([connection]);
   await screen.findByText("Team alerts");
+  fireEvent.click(screen.getByText("Manage"));
+  fireEvent.click(screen.getByRole("button", { name: "Add connection" }));
   fireEvent.click(screen.getByRole("button", { name: "Replace credentials" }));
   expect(screen.getByLabelText("Connection provider")).toBeDisabled();
   expect(screen.getByLabelText("Slack webhook URL")).toHaveValue("");
@@ -95,7 +100,8 @@ test("loads safe names, replaces only the selected connection, and supports canc
 });
 test("revokes only after user confirmation", async () => {
   await show([connection]);
-  const button = await screen.findByRole("button", { name: "Revoke" });
+  fireEvent.click(screen.getByText("Manage"));
+  const button = await screen.findByRole("button", { name: "Disconnect" });
   window.confirm.mockReturnValueOnce(false);
   fireEvent.click(button);
   expect(axios.delete).not.toHaveBeenCalled();
@@ -111,13 +117,15 @@ test("failed loads do not expose credentials", async () => {
 });
 test("save errors display safe API messages", async () => {
   await show();
+  fireEvent.click(screen.getByRole("button", { name: "Add connection" }));
   axios.post.mockRejectedValue({ response: { data: { error: "Invalid credentials" } } });
   submit();
   expect(await screen.findByRole("alert")).toHaveTextContent("Invalid credentials");
 });
 test("revoke errors are visible", async () => {
   await show([connection]);
+  fireEvent.click(screen.getByText("Manage"));
   axios.delete.mockRejectedValue(new Error("offline"));
-  fireEvent.click(await screen.findByRole("button", { name: "Revoke" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Disconnect" }));
   expect(await screen.findByRole("alert")).toHaveTextContent("Could not revoke");
 });

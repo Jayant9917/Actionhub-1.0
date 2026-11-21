@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen, fireEvent, act, within } from "@testing-library/react";
 import axios from "axios";
 import { TaskHistory } from "../components/history/TaskHistory";
+import { ToastContainer } from "../components/ui/toast";
 jest.mock("axios", () => ({ get: jest.fn() }));
 const id = "aa3f9700-a5e5-4af1-97bd-3496ac539e50";
 const pending = {
@@ -55,9 +56,41 @@ test("active table rows refresh automatically and stop polling after completion"
   });
   expect(axios.get).toHaveBeenCalledTimes(count);
 });
+test("live action failures show an actionable toast", async () => {
+  const failed = {
+    ...done,
+    status: "failed",
+    actionRuns: [
+      {
+        ...pending.actionRuns[0],
+        type: "http.request",
+        status: "failed",
+        attempts: 1,
+        errorCode: "MISSING_EVENT_FIELD",
+      },
+    ],
+  };
+  axios.get.mockImplementation((url) =>
+    Promise.resolve(url.endsWith(id) ? { data: { run: failed } } : page(pending)),
+  );
+  await act(async () => {
+    render(
+      <>
+        <TaskHistory />
+        <ToastContainer />
+      </>,
+    );
+  });
+  await act(async () => {
+    jest.advanceTimersByTime(3000);
+  });
+  expect(screen.getByRole("alert")).toHaveTextContent(
+    "HTTP request: This action uses a field that is not in the event.",
+  );
+});
 test("opening newer details immediately updates the table too", async () => {
   await setup();
-  fireEvent.click(screen.getByRole("button", { name: `View run ${id}` }));
+  fireEvent.click(screen.getByRole("button", { name: /View details for/ }));
   await act(async () => {});
   expect(within(screen.getByRole("table")).queryByText("In progress")).not.toBeInTheDocument();
   expect(within(screen.getByRole("table")).getByText("Succeeded")).toBeInTheDocument();
@@ -95,7 +128,6 @@ test("a temporary polling error keeps the last known row and recovers", async ()
 test("status-filtered rows disappear when their status changes", async () => {
   await setup();
   fireEvent.change(screen.getByLabelText("Status"), { target: { value: "running" } });
-  fireEvent.click(screen.getByRole("button", { name: "Apply filters" }));
   await act(async () => {});
   await act(async () => {
     jest.advanceTimersByTime(3000);

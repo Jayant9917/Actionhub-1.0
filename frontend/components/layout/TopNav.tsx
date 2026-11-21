@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher-1";
 
 interface TopNavProps {
   user: { name: string | null; email: string } | null;
@@ -69,6 +70,7 @@ export function TopNav({ user, onLogout, onMenuClick }: TopNavProps) {
       </div>
 
       <div className="flex items-center gap-2">
+        <ThemeSwitcher />
         {user ? (
           <div className="relative" ref={profileRef}>
             <button

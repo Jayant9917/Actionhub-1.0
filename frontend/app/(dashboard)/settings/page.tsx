@@ -3,10 +3,29 @@
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { ConnectionManager } from "@/components/workflow/ConnectionManager";
 import { Card, CardHeader } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { BACKEND_URL } from "@/app/config";
+import { apiOptions } from "@/lib/actions";
 
 export default function SettingsPage() {
+  const [account, setAccount] = useState<{
+    name: string | null;
+    email: string;
+    googleLinked?: boolean;
+  } | null>(null);
+  useEffect(() => {
+    let active = true;
+    axios
+      .get(`${BACKEND_URL}/api/v1/user`, apiOptions())
+      .then(({ data }) => {
+        if (active) setAccount(data.user);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
   return (
     <div className="container-content py-8">
       <div className="mb-8">
@@ -16,59 +35,23 @@ export default function SettingsPage() {
 
       <div className="space-y-8 max-w-2xl">
         <Card padding="lg">
-          <CardHeader
-            title="Google sign-in"
-            subtitle="Link Google to this ActionHub account without creating a separate account."
-          />
-          <GoogleSignInButton purpose="link" />
+          <CardHeader title="Account" />
+          {account && (
+            <p className="text-body">
+              {account.name && <strong className="block">{account.name}</strong>}
+              {account.email}
+            </p>
+          )}
+          {account?.googleLinked ? (
+            <p className="text-body-sm">Google sign-in linked</p>
+          ) : (
+            <details className="mt-3 text-body-sm">
+              <summary className="cursor-pointer">Google sign-in</summary>
+              <GoogleSignInButton purpose="link" />
+            </details>
+          )}
         </Card>
         <ConnectionManager />
-        <Card padding="lg">
-          <CardHeader title="Profile" subtitle="Update your personal information" />
-          <div className="space-y-4">
-            <Input label="Name" type="text" placeholder="Your name" value="" onChange={() => {}} />
-            <Input
-              label="Email"
-              type="email"
-              placeholder="you@example.com"
-              value=""
-              onChange={() => {}}
-            />
-            <Button variant="primary" size="md">
-              Save changes
-            </Button>
-          </div>
-        </Card>
-
-        <Card padding="lg">
-          <CardHeader title="Password" subtitle="Change your password" />
-          <div className="space-y-4">
-            <Input
-              label="Current password"
-              type="password"
-              placeholder="••••••••"
-              value=""
-              onChange={() => {}}
-            />
-            <Input
-              label="New password"
-              type="password"
-              placeholder="••••••••"
-              value=""
-              onChange={() => {}}
-            />
-            <Input
-              label="Confirm new password"
-              type="password"
-              placeholder="••••••••"
-              value=""
-              onChange={() => {}}
-            />
-            <Button variant="secondary" size="md">
-              Update password
-            </Button>
-          </div>
-        </Card>
       </div>
     </div>
   );

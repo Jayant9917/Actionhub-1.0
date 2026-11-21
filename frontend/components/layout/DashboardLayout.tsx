@@ -30,6 +30,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       .catch((err) => {
         if (err.response?.status === 403) {
           localStorage.removeItem("token");
+          sessionStorage.removeItem("actionhub.workflowDraft");
           router.push("/login");
         }
       })
@@ -38,6 +39,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    sessionStorage.removeItem("actionhub.workflowDraft");
     setUser(null);
     router.push("/");
   };

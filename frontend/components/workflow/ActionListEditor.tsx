@@ -39,48 +39,7 @@ function TemplateField({
       <label htmlFor={id} className="block text-body-sm font-medium">
         {label}
       </label>
-      {hasFields ? (
-        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-neutral-200 bg-white p-3 focus-within:border-brand-400">
-          {value.split(/(\{\{[^{}]+\}\})/g).map((part, index, parts) => {
-            const match = /^\{\{\s*([^{}]+?)\s*\}\}$/.exec(part);
-            if (match)
-              return (
-                <span
-                  key={index}
-                  className="inline-flex items-center gap-2 rounded-lg bg-brand-50 px-2.5 py-1 text-body-sm font-medium text-brand-700"
-                >
-                  {fieldLabels[match[1]] ?? match[1]}
-                  <button
-                    type="button"
-                    aria-label={`Remove ${fieldLabels[match[1]] ?? match[1]} from ${label}`}
-                    onClick={() => onChange(parts.filter((_, i) => i !== index).join(""))}
-                    className="rounded px-1 hover:bg-brand-100"
-                  >
-                    ×
-                  </button>
-                </span>
-              );
-            const props = {
-              id: index === 0 ? id : undefined,
-              "aria-label": index === 0 ? label : `Text after field ${index} in ${label}`,
-              value: part,
-              maxLength: Math.max(0, limit - value.length + part.length),
-              placeholder: parts.length === 1 ? "Type text or choose a field below" : "Add text...",
-              onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-                onChange(
-                  parts.map((text, i) => (i === index ? event.target.value : text)).join(""),
-                ),
-              className:
-                "min-w-[100px] flex-1 border-0 bg-transparent p-1 text-body outline-none focus:ring-0",
-            };
-            return multiline ? (
-              <textarea key={index} {...props} rows={2} />
-            ) : (
-              <input key={index} {...props} />
-            );
-          })}
-        </div>
-      ) : multiline ? (
+      {multiline ? (
         <textarea
           id={id}
           value={value}
@@ -102,6 +61,32 @@ function TemplateField({
           className="block w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-body outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
         />
       )}
+      {hasFields && (
+        <div className="rounded-lg bg-neutral-50 p-3 text-body-sm">
+          <p className="font-medium">Preview</p>
+          <div className="whitespace-pre-wrap break-words">
+            {value.split(/(\{\{[^{}]+\}\})/g).map((part, index, parts) => {
+              const field = /^\{\{\s*([^{}]+?)\s*\}\}$/.exec(part)?.[1];
+              if (!field) return part;
+              const name = fieldLabels[field] ?? field;
+              return (
+                <button
+                  type="button"
+                  key={index}
+                  className="mx-1 rounded bg-neutral-100 px-2"
+                  aria-label={`Remove ${name} from ${label}`}
+                  onClick={() => onChange(parts.filter((_, i) => i !== index).join(""))}
+                >
+                  {name} ×
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-caption text-neutral-500">
+            Highlighted fields are filled in when the workflow runs.
+          </p>
+        </div>
+      )}
       <div className="flex flex-wrap gap-3">
         <button
           type="button"
@@ -110,7 +95,7 @@ function TemplateField({
           onClick={() => setShowFields(!showFields)}
           className="text-caption font-medium text-brand-600 hover:underline"
         >
-          {showFields ? "Hide event data" : "Use event data (optional)"}
+          {showFields ? "Hide event data" : "Insert event field"}
         </button>
         {hasFields && (
           <button

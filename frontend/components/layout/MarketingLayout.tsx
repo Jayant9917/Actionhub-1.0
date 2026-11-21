@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "@/app/config";
 import { Button } from "@/components/ui/Button";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher-1";
 
 export function MarketingLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -53,6 +54,7 @@ export function MarketingLayout({ children }: { children: React.ReactNode }) {
             Automate
           </Link>
           <nav className="flex items-center gap-2">
+            <ThemeSwitcher />
             {authChecked &&
               (user ? (
                 <>

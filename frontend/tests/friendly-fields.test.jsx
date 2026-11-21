@@ -13,13 +13,15 @@ function Editor() {
     </>
   );
 }
-test("shows friendly chips while preserving stored mappings and mixed text", () => {
+test("shows a readable preview while preserving stored mappings and mixed text", () => {
   render(<Editor />);
   expect(
     screen.getByRole("button", { name: "Remove Issue title from Column 1" }),
   ).toBeInTheDocument();
-  expect(screen.getByLabelText("Column 1")).toHaveValue("");
-  fireEvent.change(screen.getByLabelText("Column 1"), { target: { value: "Issue: " } });
+  expect(screen.getByLabelText("Column 1")).toHaveValue("{{issue.title}}");
+  fireEvent.change(screen.getByLabelText("Column 1"), {
+    target: { value: "Issue: {{issue.title}}" },
+  });
   expect(JSON.parse(screen.getByTestId("saved").textContent)[0]).toBe("Issue: {{issue.title}}");
   fireEvent.click(screen.getByRole("button", { name: "Use event data for Column 1" }));
   fireEvent.change(screen.getByLabelText("Insert event field into sheet-column-0"), {

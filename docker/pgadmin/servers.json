@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "ActionHub PostgreSQL",
+      "Group": "ActionHub",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "actionhub",
+      "Username": "actionhub",
+      "SSLMode": "prefer"
+    }
+  }
+}

@@ -5,16 +5,19 @@ import Image from "next/image";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BACKEND_URL, HOOKS_URL } from "@/app/config";
+import { BACKEND_URL } from "@/app/config";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import { Modal } from "@/components/ui/Modal";
 import { apiOptions, apiMessage } from "@/lib/actions";
+import { statusLabels, type Run } from "@/lib/history";
+import { saveWorkflowName, workflowName } from "@/lib/workflow-names";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 interface Zap {
   id: string;
+  name?: string;
   triggerId: string;
   userId: number;
   actions: {
@@ -59,9 +62,61 @@ function useZaps() {
 
 export default function DashboardPage() {
   const { loading, zaps, setZaps } = useZaps();
+  const [names, setNames] = useState<Record<string, string>>({});
+  const [renaming, setRenaming] = useState<Zap | null>(null);
+  const [newName, setNewName] = useState("");
+  const [renameError, setRenameError] = useState("");
   const [deleting, setDeleting] = useState<Zap | null>(null);
   const [busy, setBusy] = useState(false),
     [deleteError, setDeleteError] = useState("");
+  const [summary, setSummary] = useState<
+    Record<string, { enabled?: boolean; latest?: Run | null }>
+  >({});
+  useEffect(() => {
+    const controller = new AbortController();
+    async function loadSummaries() {
+      const options = { ...apiOptions(), signal: controller.signal };
+      for (let offset = 0; offset < zaps.length && !controller.signal.aborted; offset += 4) {
+        await Promise.all(
+          zaps.slice(offset, offset + 4).map(async (zap) => {
+            const type = zap.trigger?.type.id ?? "webhook";
+            const endpoint =
+              type === "schedule"
+                ? "schedule"
+                : type.startsWith("github.")
+                  ? "github-trigger"
+                  : type === "tally.form_submitted"
+                    ? "tally-trigger"
+                    : "";
+            const [status, history] = await Promise.allSettled([
+              endpoint
+                ? axios
+                    .get(`${BACKEND_URL}/api/v1/zap/${zap.id}/${endpoint}`, options)
+                    .then(({ data }) => {
+                      if (endpoint !== "schedule" && data.configured === false) return undefined;
+                      return endpoint === "schedule" ? data.schedule.enabled : data.enabled;
+                    })
+                : Promise.resolve(true),
+              axios
+                .get(`${BACKEND_URL}/api/v1/runs`, { ...options, params: { workflowId: zap.id } })
+                .then(({ data }) => data.runs[0] ?? null),
+            ]);
+            if (!controller.signal.aborted)
+              setSummary((current) => ({
+                ...current,
+                [zap.id]: {
+                  enabled: status.status === "fulfilled" ? status.value : undefined,
+                  latest: history.status === "fulfilled" ? history.value : undefined,
+                },
+              }));
+          }),
+        );
+      }
+    }
+    void loadSummaries();
+    return () => controller.abort();
+  }, [zaps]);
+
   async function remove() {
     if (!deleting) return;
     setBusy(true);
@@ -113,13 +168,13 @@ export default function DashboardPage() {
                     Workflow
                   </th>
                   <th className="px-6 py-4 text-left text-body-sm font-semibold text-neutral-600">
-                    ID
+                    Trigger
                   </th>
                   <th className="px-6 py-4 text-left text-body-sm font-semibold text-neutral-600">
-                    Created
+                    Status
                   </th>
                   <th className="px-6 py-4 text-left text-body-sm font-semibold text-neutral-600">
-                    Webhook URL
+                    Last run
                   </th>
                   <th className="px-6 py-4 text-right text-body-sm font-semibold text-neutral-600">
                     Actions
@@ -127,63 +182,148 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100">
-                {zaps.map((z) => (
-                  <tr key={z.id} className="transition-colors duration-fast hover:bg-neutral-50/50">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <Image
-                          width={32}
-                          height={32}
-                          unoptimized
-                          src={z.trigger.type.image}
-                          alt=""
-                          className="h-8 w-8 rounded-lg object-cover border border-neutral-200"
-                        />
-                        {z.actions.map((x) => (
+                {zaps.map((z, index) => {
+                  const triggerName = z.trigger?.type.name ?? "Webhook";
+                  const state = summary[z.id];
+                  const latest = state?.latest;
+                  return (
+                    <tr
+                      key={z.id}
+                      className="transition-colors duration-fast hover:bg-neutral-50/50"
+                    >
+                      <td className="px-6 py-4">
+                        <p className="mb-2 font-medium">
+                          {names[z.id] || workflowName(z.id, z.name || `Automation ${index + 1}`)}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2">
                           <Image
                             width={32}
                             height={32}
                             unoptimized
-                            key={x.id}
-                            src={x.type.image}
+                            src={z.trigger?.type.image || "/webhook.svg"}
                             alt=""
                             className="h-8 w-8 rounded-lg object-cover border border-neutral-200"
                           />
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-body text-neutral-700 font-mono text-body-sm">
-                      {z.id.slice(0, 8)}…
-                    </td>
-                    <td className="px-6 py-4 text-body-sm text-neutral-500">Not recorded</td>
-                    <td className="px-6 py-4 text-body-sm text-neutral-500 font-mono max-w-[200px] truncate">
-                      {z.trigger.type.id === "schedule"
-                        ? "Runs on a schedule"
-                        : `${HOOKS_URL || (typeof window !== "undefined" ? window.location.origin : "")}${z.trigger.type.id === "tally.form_submitted" ? `/hooks/tally/${z.id}` : z.trigger.type.id.startsWith("github.") ? `/hooks/github/${z.id}` : `/hooks/catch/${z.userId}/${z.id}`}`}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button variant="ghost" size="sm" onClick={() => router.push("/zap/" + z.id)}>
-                        Open
-                      </Button>
-                      <Button
-                        variant="ghostDanger"
-                        size="sm"
-                        aria-label={`Delete automation ${z.id}`}
-                        onClick={() => {
-                          setDeleting(z);
-                          setDeleteError("");
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+                          {z.actions.map((x) => (
+                            <Image
+                              width={32}
+                              height={32}
+                              unoptimized
+                              key={x.id}
+                              src={x.type.image}
+                              alt=""
+                              className="h-8 w-8 rounded-lg object-cover border border-neutral-200"
+                            />
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-body-sm">{triggerName}</td>
+                      <td className="px-6 py-4 text-body-sm">
+                        <span className="rounded-full bg-neutral-100 px-2.5 py-1">
+                          {!state
+                            ? "Loading"
+                            : state.enabled === true
+                              ? "Active"
+                              : state.enabled === false
+                                ? "Paused"
+                                : "Unavailable"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-body-sm">
+                        {latest ? (
+                          <>
+                            <time dateTime={latest.createdAt}>
+                              {new Date(latest.createdAt).toLocaleString()}
+                            </time>
+                            <p className="text-neutral-500">
+                              {statusLabels[latest.status] ?? latest.status}
+                            </p>
+                          </>
+                        ) : !state ? (
+                          "Loading"
+                        ) : latest === null ? (
+                          "Never run"
+                        ) : (
+                          "Unavailable"
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => router.push("/zap/" + z.id)}
+                        >
+                          Open
+                        </Button>
+                        <details className="inline-block text-left text-body-sm">
+                          <summary className="cursor-pointer">More options</summary>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setNewName(workflowName(z.id, z.name ?? ""));
+                              setRenameError("");
+                              setRenaming(z);
+                            }}
+                          >
+                            Rename
+                          </Button>
+                          <Button
+                            variant="ghostDanger"
+                            size="sm"
+                            aria-label={`Delete ${z.name || `automation ${index + 1}`}`}
+                            onClick={() => {
+                              setDeleting(z);
+                              setDeleteError("");
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </details>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </Card>
       )}
+      <Modal
+        isOpen={!!renaming}
+        onClose={() => setRenaming(null)}
+        title="Rename automation"
+        size="sm"
+      >
+        <form
+          className="space-y-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!renaming || !newName.trim()) return;
+            try {
+              saveWorkflowName(renaming.id, newName);
+              setNames((current) => ({ ...current, [renaming.id]: newName.trim() }));
+              setRenaming(null);
+            } catch {
+              setRenameError("Could not save the name in this browser.");
+            }
+          }}
+        >
+          <label className="block text-body-sm">
+            Workflow name
+            <input
+              className="mt-1 w-full rounded-xl border border-neutral-200 bg-white p-3"
+              required
+              maxLength={80}
+              value={newName}
+              onChange={(event) => setNewName(event.target.value)}
+            />
+          </label>
+          <p className="text-caption text-neutral-500">This name is saved in this browser.</p>
+          {renameError && <p role="alert">{renameError}</p>}
+          <Button type="submit">Save name</Button>
+        </form>
+      </Modal>
       <Modal
         isOpen={!!deleting}
         onClose={() => {
@@ -197,7 +337,6 @@ export default function DashboardPage() {
             This removes the automation and stops new events. Queued actions are cancelled;
             already-started actions may finish. Execution history and saved connections are kept.
           </p>
-          <p className="break-all text-caption text-neutral-500">{deleting?.id}</p>
           {deleteError && (
             <p role="alert" className="text-red-600">
               {deleteError}
