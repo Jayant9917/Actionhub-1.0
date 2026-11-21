@@ -24,6 +24,7 @@ export function createTestEventHandler(
           id: String(req.params.zapId),
           userId,
           deletedAt: null,
+          webhookEnabled: true,
           trigger: { triggerId: "webhook" },
         },
         select: { id: true, actions: { select: { id: true } } },

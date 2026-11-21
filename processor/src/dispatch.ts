@@ -1,7 +1,10 @@
 import type { PrismaClient } from "./generated/prisma/client.js";
 import { createActionJob } from "./payload.js";
 
-type Database = Pick<PrismaClient, "$transaction" | "zapRunOutbox" | "actionRun" | "legacyJob">;
+type Database = Pick<
+  PrismaClient,
+  "$queryRaw" | "$transaction" | "zapRunOutbox" | "actionRun" | "legacyJob"
+>;
 type Publish = (job: ReturnType<typeof createActionJob>) => Promise<void>;
 
 export async function dispatchActions(
@@ -62,16 +65,26 @@ export async function dispatchActions(
       leaseUntil: null,
     },
   });
-  const due = await db.actionRun.findMany({
-    where: {
-      zapRun: { zap: { deletedAt: null } },
-      status: { in: ["pending", "retry"] },
-      nextAttemptAt: { lte: now },
-      dispatchAfter: { lte: now },
-    },
-    orderBy: { createdAt: "asc" },
-    take: batchSize,
-  });
+  // A retry blocks later steps until it settles. Other runs can progress independently.
+  // Old snapshots have no sequence and retain their original behavior.
+  const due = await db.$queryRaw<{ id: string; zapRunId: string }[]>`
+    SELECT action.id, action."zapRunId"
+    FROM "ActionRun" action
+    JOIN "ZapRun" run ON run.id = action."zapRunId"
+    JOIN "Zap" workflow ON workflow.id = run."zapId"
+    WHERE workflow."deletedAt" IS NULL
+      AND action.status IN ('pending', 'retry')
+      AND action."nextAttemptAt" <= ${now}
+      AND action."dispatchAfter" <= ${now}
+      AND NOT EXISTS (
+        SELECT 1 FROM "ActionRun" earlier
+        WHERE earlier."zapRunId" = action."zapRunId"
+          AND earlier.sequence < action.sequence
+          AND earlier.status IN ('pending', 'retry', 'running')
+      )
+    ORDER BY action."createdAt", action.id
+    LIMIT ${batchSize}
+  `;
   for (const run of due) {
     // A short dispatch lease limits duplicate publication across processor instances.
     const lease = await db.actionRun.updateMany({
@@ -82,7 +95,7 @@ export async function dispatchActions(
     try {
       await publish(createActionJob(run));
     } catch {
-      // Lease expires automatically. Continue publishing sibling actions this cycle.
+      // Lease expires automatically. Continue publishing other eligible actions this cycle.
       console.error("Action publication deferred", { actionExecutionId: run.id });
     }
   }

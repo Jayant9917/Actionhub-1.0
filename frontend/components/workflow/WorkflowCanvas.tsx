@@ -107,6 +107,7 @@ type Props = {
   fixedTrigger?: boolean;
   savedWorkflow?: boolean;
   onTriggerClosed?: () => void;
+  workflowNameField?: ReactNode;
   triggerSetupControl?: ReactNode;
   renderTriggerSettings: (done: () => void) => ReactNode;
 };
@@ -125,6 +126,7 @@ export function WorkflowCanvas({
   onTriggerClosed,
   renderTriggerSettings,
   triggerSetupControl,
+  workflowNameField,
 }: Props) {
   const [selection, setSelection] = useState<Selection>(null);
   const selectionRef = useRef(selection);
@@ -199,6 +201,7 @@ export function WorkflowCanvas({
             {saving ? "Saving..." : saveLabel}
           </Button>
         </div>
+        {workflowNameField && <div className="container-content mt-3">{workflowNameField}</div>}
         {message && (
           <p role="status" className="container-content mt-2 text-body-sm text-green-700">
             {message}

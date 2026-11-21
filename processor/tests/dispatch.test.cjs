@@ -20,11 +20,11 @@ beforeEach(() => {
   };
   db = {
     legacyJob: { updateMany: jest.fn() },
+    $queryRaw: jest.fn().mockResolvedValue([]),
     $transaction: jest.fn((fn) => fn(tx)),
     zapRunOutbox: { findMany: jest.fn().mockResolvedValue([]) },
     actionRun: {
       updateMany: jest.fn().mockResolvedValue({ count: 1 }),
-      findMany: jest.fn().mockResolvedValue([]),
     },
   };
   publish = jest.fn();
@@ -60,28 +60,27 @@ test("expired worker leases require review rather than automatic resend", async 
   });
 });
 test("publishes one reference job for each due action", async () => {
-  db.actionRun.findMany.mockResolvedValue([
+  db.$queryRaw.mockResolvedValue([
     { id: "a", zapRunId: "run" },
-    { id: "b", zapRunId: "run" },
+    { id: "b", zapRunId: "another-run" },
   ]);
   await dispatchActions(db, publish, now);
   expect(publish.mock.calls.map(([job]) => job.actionExecutionId)).toEqual(["a", "b"]);
-  expect(db.actionRun.findMany.mock.calls[0][0].where).toMatchObject({
-    status: { in: ["pending", "retry"] },
-    nextAttemptAt: { lte: now },
-    dispatchAfter: { lte: now },
-  });
+  const [sql, cutoff, dispatchCutoff, limit] = db.$queryRaw.mock.calls[0];
+  expect(sql.join(" ")).toContain("earlier.sequence < action.sequence");
+  expect(sql.join(" ")).toContain("earlier.status IN ('pending', 'retry', 'running')");
+  expect([cutoff, dispatchCutoff, limit]).toEqual([now, now, 50]);
 });
 test("another processor's lease prevents duplicate publication", async () => {
-  db.actionRun.findMany.mockResolvedValue([{ id: "a", zapRunId: "run" }]);
+  db.$queryRaw.mockResolvedValue([{ id: "a", zapRunId: "run" }]);
   db.actionRun.updateMany.mockResolvedValue({ count: 0 });
   await dispatchActions(db, publish, now);
   expect(publish).not.toHaveBeenCalled();
 });
-test("partial publication failure retains durable work and continues siblings", async () => {
-  db.actionRun.findMany.mockResolvedValue([
+test("partial publication failure retains durable work and continues other runs", async () => {
+  db.$queryRaw.mockResolvedValue([
     { id: "a", zapRunId: "run" },
-    { id: "b", zapRunId: "run" },
+    { id: "b", zapRunId: "another-run" },
   ]);
   publish.mockRejectedValueOnce(new Error("Kafka unavailable"));
   await dispatchActions(db, publish, now);
@@ -106,7 +105,7 @@ test("deleted legacy workflows do not backfill new actions", async () => {
   await dispatchActions(db, publish, now);
   expect(tx.actionRun.upsert).not.toHaveBeenCalled();
   expect(tx.zapRunOutbox.deleteMany).toHaveBeenCalled();
-  expect(db.actionRun.findMany.mock.calls[0][0].where.zapRun).toEqual({ zap: { deletedAt: null } });
+  expect(db.$queryRaw.mock.calls[0][0].join(" ")).toContain('workflow."deletedAt" IS NULL');
 });
 
 test("cancels any queued run committed after workflow deletion", async () => {
@@ -124,5 +123,5 @@ test("cancels any queued run committed after workflow deletion", async () => {
 
 test("uses the configured action dispatch batch size", async () => {
   await dispatchActions(db, publish, now, 7);
-  expect(db.actionRun.findMany.mock.calls[0][0].take).toBe(7);
+  expect(db.$queryRaw.mock.calls[0][3]).toBe(7);
 });

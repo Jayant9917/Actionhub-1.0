@@ -51,12 +51,15 @@ export function GoogleSignInButton({ purpose = "login" }: { purpose?: "login" | 
   return (
     <div className="mt-5 space-y-2">
       {linkRequired && purpose === "login" && (
-        <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-body-sm text-neutral-800">
+        <div
+          role="alert"
+          className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-body-sm text-neutral-800"
+        >
           <p className="font-semibold">Link Google to your existing account</p>
           <p className="mt-2">
-            An ActionHub account already uses this email. Log in below with your email and
-            password, then open Settings and choose Link Google sign-in. Select the same
-            Google account to finish linking. After that, you can use Continue with Google.
+            An ActionHub account already uses this email. Log in below with your email and password,
+            then open Settings and choose Link Google sign-in. Select the same Google account to
+            finish linking. After that, you can use Continue with Google.
           </p>
         </div>
       )}

@@ -12,12 +12,13 @@ import { TableSkeleton } from "@/components/ui/Skeleton";
 import { Modal } from "@/components/ui/Modal";
 import { apiOptions, apiMessage } from "@/lib/actions";
 import { statusLabels, type Run } from "@/lib/history";
-import { saveWorkflowName, workflowName } from "@/lib/workflow-names";
+import { workflowName } from "@/lib/workflow-names";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 interface Zap {
   id: string;
-  name?: string;
+  name?: string | null;
+  webhookEnabled?: boolean;
   triggerId: string;
   userId: number;
   actions: {
@@ -64,6 +65,9 @@ export default function DashboardPage() {
   const { loading, zaps, setZaps } = useZaps();
   const [names, setNames] = useState<Record<string, string>>({});
   const [renaming, setRenaming] = useState<Zap | null>(null);
+  const [renamingBusy, setRenamingBusy] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [statusError, setStatusError] = useState("");
   const [newName, setNewName] = useState("");
   const [renameError, setRenameError] = useState("");
   const [deleting, setDeleting] = useState<Zap | null>(null);
@@ -96,7 +100,7 @@ export default function DashboardPage() {
                       if (endpoint !== "schedule" && data.configured === false) return undefined;
                       return endpoint === "schedule" ? data.schedule.enabled : data.enabled;
                     })
-                : Promise.resolve(true),
+                : Promise.resolve(zap.webhookEnabled ?? true),
               axios
                 .get(`${BACKEND_URL}/api/v1/runs`, { ...options, params: { workflowId: zap.id } })
                 .then(({ data }) => data.runs[0] ?? null),
@@ -116,6 +120,19 @@ export default function DashboardPage() {
     void loadSummaries();
     return () => controller.abort();
   }, [zaps]);
+
+  async function toggleStatus(id: string, enabled: boolean) {
+    setUpdatingStatus(id);
+    setStatusError("");
+    try {
+      await axios.patch(`${BACKEND_URL}/api/v1/zap/${id}`, { enabled }, apiOptions());
+      setSummary((current) => ({ ...current, [id]: { ...current[id], enabled } }));
+    } catch (error) {
+      setStatusError(apiMessage(error, "Could not change workflow status."));
+    } finally {
+      setUpdatingStatus(null);
+    }
+  }
 
   async function remove() {
     if (!deleting) return;
@@ -145,6 +162,11 @@ export default function DashboardPage() {
         </Button>
       </div>
 
+      {statusError && (
+        <p role="alert" className="mb-4 text-red-600">
+          {statusError}
+        </p>
+      )}
       {loading ? (
         <Card padding="lg">
           <TableSkeleton rows={6} cols={5} />
@@ -193,7 +215,7 @@ export default function DashboardPage() {
                     >
                       <td className="px-6 py-4">
                         <p className="mb-2 font-medium">
-                          {names[z.id] || workflowName(z.id, z.name || `Automation ${index + 1}`)}
+                          {names[z.id] || z.name || workflowName(z.id, `Automation ${index + 1}`)}
                         </p>
                         <div className="flex flex-wrap items-center gap-2">
                           <Image
@@ -257,11 +279,21 @@ export default function DashboardPage() {
                         </Button>
                         <details className="inline-block text-left text-body-sm">
                           <summary className="cursor-pointer">More options</summary>
+                          {typeof state?.enabled === "boolean" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              disabled={!!updatingStatus}
+                              onClick={() => void toggleStatus(z.id, !state.enabled)}
+                            >
+                              {state.enabled ? "Pause workflow" : "Resume workflow"}
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => {
-                              setNewName(workflowName(z.id, z.name ?? ""));
+                              setNewName(z.name || workflowName(z.id, ""));
                               setRenameError("");
                               setRenaming(z);
                             }}
@@ -297,15 +329,22 @@ export default function DashboardPage() {
       >
         <form
           className="space-y-4"
-          onSubmit={(event) => {
+          onSubmit={async (event) => {
             event.preventDefault();
-            if (!renaming || !newName.trim()) return;
+            if (!renaming || !newName.trim() || renamingBusy) return;
+            setRenamingBusy(true);
             try {
-              saveWorkflowName(renaming.id, newName);
+              await axios.patch(
+                `${BACKEND_URL}/api/v1/zap/${renaming.id}`,
+                { name: newName.trim() },
+                apiOptions(),
+              );
               setNames((current) => ({ ...current, [renaming.id]: newName.trim() }));
               setRenaming(null);
-            } catch {
-              setRenameError("Could not save the name in this browser.");
+            } catch (error) {
+              setRenameError(apiMessage(error, "Could not save the workflow name."));
+            } finally {
+              setRenamingBusy(false);
             }
           }}
         >
@@ -319,9 +358,10 @@ export default function DashboardPage() {
               onChange={(event) => setNewName(event.target.value)}
             />
           </label>
-          <p className="text-caption text-neutral-500">This name is saved in this browser.</p>
           {renameError && <p role="alert">{renameError}</p>}
-          <Button type="submit">Save name</Button>
+          <Button type="submit" disabled={renamingBusy}>
+            {renamingBusy ? "Saving..." : "Save name"}
+          </Button>
         </form>
       </Modal>
       <Modal

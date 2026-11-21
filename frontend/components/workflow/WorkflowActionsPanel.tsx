@@ -25,6 +25,8 @@ export function WorkflowActionsPanel({
   const [revision, setRevision] = useState(0);
   const [trigger, setTrigger] = useState("webhook");
   const [persistedTrigger, setPersistedTrigger] = useState("webhook");
+  const [name, setName] = useState<string | null>(null);
+  const [createdAt, setCreatedAt] = useState<string | null>(null);
   const [owner, setOwner] = useState("");
   const [origin, setOrigin] = useState("");
   const [testEventsEnabled, setTestEventsEnabled] = useState(false);
@@ -59,6 +61,8 @@ export function WorkflowActionsPanel({
       const savedTrigger = data.zap.trigger?.type.id ?? "webhook";
       setTrigger(savedTrigger);
       setPersistedTrigger(savedTrigger);
+      setName(data.zap.name ?? null);
+      setCreatedAt(data.zap.createdAt ?? null);
       setOwner(String(data.zap.userId));
       setRevision(data.zap.actionsRevision);
       setTestEventsEnabled(data.testEventsEnabled === true);
@@ -110,7 +114,7 @@ export function WorkflowActionsPanel({
   return (
     <div>
       <WorkflowCanvas
-        title={workflowName(workflowId, "Workflow")}
+        title={name || workflowName(workflowId, "Workflow")}
         savedWorkflow
         triggerSetupControl={
           persistedTrigger === "schedule" ? (
@@ -190,6 +194,11 @@ export function WorkflowActionsPanel({
       />
       <details className="container-content py-4 text-body-sm text-neutral-600">
         <summary className="cursor-pointer">Technical details</summary>
+        {createdAt && (
+          <p className="mt-2">
+            Created <time dateTime={createdAt}>{new Date(createdAt).toLocaleString()}</time>
+          </p>
+        )}
         <div className="mt-2 flex flex-wrap items-center gap-2 break-all">
           <code>{workflowId}</code>
           <Button

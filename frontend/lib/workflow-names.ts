@@ -5,7 +5,3 @@ export function workflowName(id: string, fallback: string) {
     return fallback;
   }
 }
-
-export function saveWorkflowName(id: string, name: string) {
-  localStorage.setItem(`actionhub.workflowName.${id}`, name.trim());
-}

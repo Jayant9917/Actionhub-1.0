@@ -28,11 +28,12 @@ router.get("/", authMiddleware, async (req, res) => {
     select: {
       name: true,
       email: true,
+      googleSubject: true,
     },
   });
 
   return res.json({
-    user,
+    user: user ? { name: user.name, email: user.email, googleLinked: !!user.googleSubject } : null,
   });
 });
 

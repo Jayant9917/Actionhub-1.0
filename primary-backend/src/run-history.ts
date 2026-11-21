@@ -33,10 +33,16 @@ const runSelect = {
   id: true,
   zapId: true,
   createdAt: true,
-  zap: { select: { deletedAt: true, trigger: { select: { type: { select: { name: true } } } } } },
+  zap: {
+    select: {
+      name: true,
+      deletedAt: true,
+      trigger: { select: { type: { select: { name: true } } } },
+    },
+  },
   actionRuns: {
     select: actionSelect,
-    orderBy: [{ createdAt: "asc" as const }, { id: "asc" as const }],
+    orderBy: [{ sequence: "asc" as const }, { createdAt: "asc" as const }, { id: "asc" as const }],
   },
 } satisfies Prisma.ZapRunSelect;
 const active = ["pending", "running", "retry"];
@@ -121,7 +127,11 @@ export function createRunHistoryHandlers(db: Pick<PrismaClient, "zap" | "zapRun"
           }),
           db.zap.findMany({
             where: { userId, deletedAt: null },
-            select: { id: true, trigger: { select: { type: { select: { name: true } } } } },
+            select: {
+              id: true,
+              name: true,
+              trigger: { select: { type: { select: { name: true } } } },
+            },
             orderBy: { id: "asc" },
           }),
         ]);

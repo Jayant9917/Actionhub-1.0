@@ -15,9 +15,17 @@ export type Run = {
   createdAt: string;
   status: string;
   actionRuns: RunAction[];
-  zap: { deletedAt?: string | null; trigger: { type: { name: string } } | null };
+  zap: {
+    name?: string | null;
+    deletedAt?: string | null;
+    trigger: { type: { name: string } } | null;
+  };
 };
-export type WorkflowOption = { id: string; trigger: { type: { name: string } } | null };
+export type WorkflowOption = {
+  id: string;
+  name?: string | null;
+  trigger: { type: { name: string } } | null;
+};
 export const statusLabels: Record<string, string> = {
   cancelled: "Cancelled",
   pending: "Pending",

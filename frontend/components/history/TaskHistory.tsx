@@ -246,7 +246,8 @@ export function TaskHistory() {
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [mergeRun, notifyActionFailures]);
-  const readableName = (id: string, trigger: string) => {
+  const readableName = (id: string, trigger: string, name?: string | null) => {
+    if (name) return name;
     const matches = workflows.filter(
       (workflow) => (workflow.trigger?.type.name ?? "Workflow") === trigger,
     );
@@ -279,7 +280,11 @@ export function TaskHistory() {
             <option value="">All workflows</option>
             {workflows.map((workflow) => (
               <option key={workflow.id} value={workflow.id}>
-                {readableName(workflow.id, workflow.trigger?.type.name ?? "Workflow")}
+                {readableName(
+                  workflow.id,
+                  workflow.trigger?.type.name ?? "Workflow",
+                  workflow.name,
+                )}
               </option>
             ))}
           </select>
@@ -354,7 +359,11 @@ export function TaskHistory() {
                 <tr key={run.id} className="hover:bg-neutral-50/60">
                   <td className="px-5 py-4">
                     <p className="font-medium text-neutral-900">
-                      {readableName(run.zapId, run.zap.trigger?.type.name ?? "Workflow")}
+                      {readableName(
+                        run.zapId,
+                        run.zap.trigger?.type.name ?? "Workflow",
+                        run.zap.name,
+                      )}
                     </p>
                   </td>
                   <td className="whitespace-nowrap px-5 py-4">
@@ -378,7 +387,7 @@ export function TaskHistory() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      aria-label={`View details for ${readableName(run.zapId, run.zap.trigger?.type.name ?? "Workflow")}`}
+                      aria-label={`View details for ${readableName(run.zapId, run.zap.trigger?.type.name ?? "Workflow", run.zap.name)}`}
                       onClick={() => setSelected(run.id)}
                     >
                       View details
@@ -421,7 +430,11 @@ export function TaskHistory() {
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-title-sm">
-                  {readableName(detail.zapId, detail.zap.trigger?.type.name ?? "Workflow")}
+                  {readableName(
+                    detail.zapId,
+                    detail.zap.trigger?.type.name ?? "Workflow",
+                    detail.zap.name,
+                  )}
                 </h3>
                 <Status value={detail.status} />
               </div>
