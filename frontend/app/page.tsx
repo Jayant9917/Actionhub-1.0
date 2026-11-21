@@ -9,7 +9,6 @@ import {
   TestimonialsSection,
   PricingPreviewSection,
   FAQSection,
-  FinalCTASection,
   LandingFooter,
 } from "@/components/landing";
 
@@ -26,7 +25,6 @@ export default function Home() {
         <TestimonialsSection />
         <PricingPreviewSection />
         <FAQSection />
-        <FinalCTASection />
         <LandingFooter />
       </main>
     </MarketingLayout>
