@@ -10,7 +10,7 @@ const APPS = [
   { name: "Stripe", slug: "stripe" },
   { name: "Airtable", slug: "airtable" },
   { name: "GitHub", slug: "github" },
-  { name: "Google Sheets", slug: "google-sheets" },
+  { name: "Sheets", slug: "google-sheets" },
   { name: "Discord", slug: "discord" },
   { name: "Linear", slug: "linear" },
   { name: "Figma", slug: "figma" },
@@ -41,7 +41,7 @@ export function IntegrationsSection() {
                   loading="lazy"
                   decoding="async"
                 />
-                <span>{name}</span>
+                <span className="whitespace-nowrap">{name}</span>
               </div>
             ))}
           </div>
