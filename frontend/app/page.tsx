@@ -23,8 +23,8 @@ export default function Home() {
         <FeatureSection />
         <IntegrationsSection />
         <TestimonialsSection />
-        <PricingPreviewSection />
         <FAQSection />
+        <PricingPreviewSection />
         <LandingFooter />
       </main>
     </MarketingLayout>
