@@ -39,7 +39,7 @@ export function FAQSection() {
       <section
         id="faq"
         aria-labelledby="faq-heading"
-        className="section-padding bg-white text-neutral-900"
+        className="section-padding bg-white dark:bg-[#121212] text-neutral-900"
       >
         <div className="container-content mx-auto max-w-4xl">
           <h2

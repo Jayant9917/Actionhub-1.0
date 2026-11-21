@@ -28,7 +28,7 @@ export function ProblemSection() {
 
   return (
     <FadeInSection>
-      <section className="section-padding relative isolate overflow-hidden bg-neutral-50/50 dark:bg-neutral-950">
+      <section className="section-padding relative isolate overflow-hidden bg-neutral-50/50 dark:bg-[#121212]">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -right-20 top-1/3 -z-10 size-80 bg-[radial-gradient(circle,rgba(0,179,255,0.4)_1px,transparent_1.5px)] [background-size:7px_7px] opacity-35 [mask-image:radial-gradient(ellipse_at_center,#000,transparent_70%)] motion-safe:animate-pulse motion-reduce:animate-none"

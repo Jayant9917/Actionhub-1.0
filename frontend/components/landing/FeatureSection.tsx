@@ -102,7 +102,7 @@ function BoltIcon({ className }: { className?: string }) {
 export function FeatureSection() {
   return (
     <FadeInSection>
-      <section className="section-padding bg-neutral-50/50 dark:bg-neutral-950">
+      <section className="section-padding bg-neutral-50/50 dark:bg-[#121212]">
         <div className="container-content text-center">
           <h2 className="section-heading">Built for automation that just works</h2>
           <p className="section-subtext">
