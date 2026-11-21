@@ -1,38 +1,42 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { FadeInSection } from "./FadeInSection";
 import { Button } from "@/components/ui/Button";
-import { useMarketingAuth } from "@/components/layout/MarketingLayout";
 
 export function FinalCTASection() {
   const router = useRouter();
-  const { user, authChecked } = useMarketingAuth();
-  const destination = user ? "/dashboard" : "/signup";
-  const label = user ? "Open dashboard" : "Create an account";
 
   return (
-    <section className="border-t border-neutral-200 bg-neutral-100 py-12 dark:border-neutral-800 dark:bg-neutral-100 md:py-14">
-      <div className="container-content flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-900">
-            Ready to connect the next steps?
+    <FadeInSection>
+      <section className="section-padding bg-neutral-900">
+        <div className="container-content text-center">
+          <h2 className="text-display-sm font-semibold tracking-tight text-white md:text-display">
+            Ready to automate?
           </h2>
-          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-            Build a workflow, publish it, and keep an eye on every run.
+          <p className="mt-4 max-w-xl mx-auto text-body text-neutral-400">
+            Join teams who ship faster. Start free—no credit card required.
           </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => router.push("/signup")}
+              className="!bg-white !text-neutral-900 hover:!bg-neutral-100"
+            >
+              Start for Free
+            </Button>
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={() => router.push("/login")}
+              className="!text-white hover:!bg-white/10"
+            >
+              Log in
+            </Button>
+          </div>
         </div>
-        <Button
-          variant="primary"
-          size="lg"
-          disabled={!authChecked}
-          onClick={() => router.push(destination)}
-          className="shrink-0 rounded-lg shadow-none transition-opacity hover:opacity-85"
-          style={{ backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }}
-        >
-          {label} <ArrowRight size={16} aria-hidden="true" />
-        </Button>
-      </div>
-    </section>
+      </section>
+    </FadeInSection>
   );
 }

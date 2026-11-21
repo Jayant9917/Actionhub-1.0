@@ -1,12 +1,16 @@
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
 import {
-  FAQSection,
-  FinalCTASection,
   HeroSection,
+  SocialProofSection,
+  ProblemSection,
   HowItWorksSection,
+  FeatureSection,
+  BuilderPreviewSection,
   IntegrationsSection,
+  TestimonialsSection,
+  PricingPreviewSection,
+  FinalCTASection,
   LandingFooter,
-  TaskHistorySection,
 } from "@/components/landing";
 
 export default function Home() {
@@ -14,10 +18,14 @@ export default function Home() {
     <MarketingLayout>
       <main>
         <HeroSection />
+        <SocialProofSection />
+        <ProblemSection />
         <HowItWorksSection />
-        <TaskHistorySection />
+        <FeatureSection />
+        <BuilderPreviewSection />
         <IntegrationsSection />
-        <FAQSection />
+        <TestimonialsSection />
+        <PricingPreviewSection />
         <FinalCTASection />
         <LandingFooter />
       </main>

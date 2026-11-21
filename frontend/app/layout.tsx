@@ -7,8 +7,8 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ActionHub — Workflow automation",
-  description: "Connect triggers and actions, publish workflows, and track runs in ActionHub.",
+  title: "Automate — Workflow automation",
+  description: "Connect your apps and automate workflows. No code required.",
 };
 
 export default function RootLayout({
