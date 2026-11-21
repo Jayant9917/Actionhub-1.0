@@ -31,7 +31,7 @@ export function LandingFooter() {
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3 lg:grid-cols-5">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="text-title font-semibold text-neutral-900">
-              actiohub
+              ActionHub
             </Link>
             <p className="mt-3 text-body-sm text-neutral-500">
               Workflow automation for modern teams.
@@ -72,7 +72,7 @@ export function LandingFooter() {
         </section>
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-neutral-200 pt-8 sm:flex-row">
           <p className="text-body-sm text-neutral-500">
-            © {new Date().getFullYear()} actiohub. All rights reserved.
+            © {new Date().getFullYear()} ActionHub. All rights reserved.
           </p>
         </div>
       </div>

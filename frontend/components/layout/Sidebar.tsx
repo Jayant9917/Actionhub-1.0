@@ -139,13 +139,13 @@ export function Sidebar({
         <div className="flex h-14 items-center border-b border-neutral-200 px-4">
           {!collapsed && (
             <Link href="/dashboard" className="text-title font-semibold text-neutral-900">
-              actiohub
+              ActionHub
             </Link>
           )}
           {collapsed && (
             <Link
               href="/dashboard"
-              aria-label="actiohub dashboard"
+              aria-label="ActionHub dashboard"
               className="flex size-10 items-center justify-center rounded-xl"
             >
               <Image src="/icon.png" alt="" width={40} height={40} className="size-10 rounded-xl object-contain" />

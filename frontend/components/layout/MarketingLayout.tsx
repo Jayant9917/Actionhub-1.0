@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -50,9 +51,10 @@ export function MarketingLayout({ children }: { children: React.ReactNode }) {
         <div className="container-content relative flex h-16 items-center justify-between">
           <Link
             href="/"
-            className="text-title font-semibold text-neutral-900 transition-opacity duration-fast hover:opacity-80"
+            className="flex items-center gap-2 text-title font-semibold text-neutral-900 transition-opacity duration-fast hover:opacity-80"
           >
-            actiohub
+            <Image src="/icon.png" alt="" width={28} height={28} className="size-7 rounded-md object-contain" />
+            ActionHub
           </Link>
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-3 lg:flex" aria-label="Primary navigation">
             <Link
