@@ -63,10 +63,12 @@ export function LandingFooter() {
             A note from the team
           </h2>
           <p className="mt-3 text-body-sm leading-6 text-neutral-600">
-            ActionHub is built around a simple idea: workflows should quietly take care of repetitive
-            work, so teams can stay focused on what they&apos;re here to ship.
+            {"A form comes in. A spreadsheet row gets added. Discord gets the update. And you? You didn’t have to copy and paste a thing."}
           </p>
-          <p className="mt-4 text-body-sm font-medium text-neutral-900">The ActionHub team</p>
+          <p className="mt-4 text-body-sm leading-6 text-neutral-600">
+            {"That’s why we built ActionHub. Give the repeat stuff a workflow and get back to the work you actually want to do."}
+          </p>
+          <p className="mt-4 text-body-sm font-medium text-neutral-900">The ActionHub team ⚡</p>
         </section>
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-neutral-200 pt-8 sm:flex-row">
           <p className="text-body-sm text-neutral-500">
