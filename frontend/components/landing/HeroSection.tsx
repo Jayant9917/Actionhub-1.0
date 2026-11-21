@@ -1,53 +1,101 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { WorkflowDemo } from "./WorkflowDemo";
 
 export function HeroSection() {
   const router = useRouter();
 
   return (
-    <section className="relative overflow-hidden bg-white pb-14 pt-12 dark:bg-neutral-950 md:pb-20 md:pt-16">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-[radial-gradient(ellipse_at_50%_0%,rgba(163,163,163,0.18),transparent_68%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.08),transparent_68%)]" />
-      <div className="container-content relative">
+    <section className="relative overflow-hidden bg-gradient-to-b from-neutral-50 via-neutral-100 to-neutral-50 pt-16 pb-24 md:pt-24 md:pb-32">
+      <div className="container-content relative z-10">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3.5 py-1.5 text-xs font-medium text-neutral-600 shadow-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-600">
-            <Sparkles size={14} aria-hidden="true" /> No-code automation, without the busywork
-          </div>
-          <h1 className="text-display-sm font-semibold tracking-[-0.045em] text-neutral-900 md:text-display lg:text-[3.75rem] lg:leading-[1.08]">
-            Your apps have work to do.
-            <br className="hidden sm:block" />
-            <span className="text-neutral-500 dark:text-neutral-400">Let them do it.</span>
+          <h1 className="text-display-sm font-semibold tracking-tight text-neutral-900 md:text-display lg:text-[3.25rem] lg:leading-[1.15]">
+            Automate your work.
+            <br />
+            <span className="text-brand-600">Without the complexity.</span>
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-neutral-600 dark:text-neutral-400 md:text-lg">
-            Turn repetitive tasks into reliable workflows. Connect the tools you already use and get back to the work that moves you forward.
+          <p className="mt-6 text-lg text-neutral-600 md:text-xl md:leading-relaxed">
+            Connect your apps in minutes. Build powerful workflows with no code—so you can ship
+            faster and focus on what matters.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button variant="primary" size="lg" onClick={() => router.push("/signup")} className="rounded-lg shadow-none transition-opacity hover:opacity-85" style={{ backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }}>
-              Start for free <ArrowRight size={16} aria-hidden="true" />
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <Button variant="primary" size="lg" onClick={() => router.push("/signup")}>
+              Start for Free
             </Button>
             <Button
               variant="secondary"
               size="lg"
-              onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })}
-              className="rounded-lg border-neutral-300 bg-transparent dark:border-neutral-700 dark:bg-transparent dark:text-neutral-900 dark:hover:bg-neutral-900"
+              onClick={() => {
+                const el = document.getElementById("how-it-works");
+                el?.scrollIntoView({ behavior: "smooth" });
+              }}
             >
-              How it works <ArrowDown size={15} aria-hidden="true" />
+              See How It Works
             </Button>
           </div>
         </div>
 
-        <div className="mx-auto mt-11 max-w-5xl md:mt-14">
-          <WorkflowDemo />
+        {/* Product mockup - floating card with glass effect */}
+        <div className="mt-16 md:mt-20 flex justify-center">
+          <div className="animate-float w-full max-w-3xl">
+            <div className="rounded-2xl border border-neutral-200/80 bg-white/80 p-6 shadow-soft-lg backdrop-blur-sm md:p-8">
+              <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-4 md:p-6">
+                <p className="mb-4 text-body-sm font-medium text-neutral-500">Automation flow</p>
+                <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
+                  <div className="flex min-w-[200px] items-center gap-3 rounded-xl border-2 border-brand-200 bg-brand-50/50 px-4 py-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-100 text-body font-semibold text-brand-700">
+                      1
+                    </span>
+                    <div>
+                      <p className="text-caption font-medium text-neutral-500">TRIGGER</p>
+                      <p className="text-body font-medium text-neutral-900">Webhook</p>
+                    </div>
+                  </div>
+                  <div className="hidden sm:block h-0 w-6 border-t-2 border-dashed border-neutral-300" />
+                  <div className="flex min-w-[200px] items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-body font-semibold text-neutral-600">
+                      2
+                    </span>
+                    <div>
+                      <p className="text-caption font-medium text-neutral-500">ACTION</p>
+                      <p className="text-body font-medium text-neutral-900">Send email</p>
+                    </div>
+                  </div>
+                  <div className="hidden sm:block h-0 w-6 border-t-2 border-dashed border-neutral-300" />
+                  <div className="flex min-w-[200px] items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-body font-semibold text-neutral-600">
+                      3
+                    </span>
+                    <div>
+                      <p className="text-caption font-medium text-neutral-500">ACTION</p>
+                      <p className="text-body font-medium text-neutral-900">Notify</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-neutral-200 pt-6 text-xs text-neutral-500 dark:border-neutral-800 dark:text-neutral-400 md:mt-12">
-          <span className="font-medium text-neutral-600 dark:text-neutral-600">Built for the way your team works</span>
-          <span>50+ integrations</span>
-          <span>Setup in minutes</span>
-          <span>No code required</span>
+        {/* Social proof */}
+        <div className="mt-20 border-t border-neutral-200 pt-12">
+          <p className="text-center text-body-sm font-medium text-neutral-500">
+            Trusted by teams who ship fast
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
+            {["10K+", "50+", "99.9%", "2 min"].map((stat, i) => (
+              <div key={i} className="text-center">
+                <span className="text-title text-neutral-900 font-semibold">{stat}</span>
+                <span className="ml-1.5 text-body-sm text-neutral-500">
+                  {i === 0 && "workflows run"}
+                  {i === 1 && "integrations"}
+                  {i === 2 && "uptime"}
+                  {i === 3 && "to first automation"}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
