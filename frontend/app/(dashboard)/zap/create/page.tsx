@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 export default function CreateAutomationPage() {
   const router = useRouter();
+  const [name, setName] = useState("");
   const [schedule, setSchedule] = useState(initialSchedule);
   const [trigger, setTrigger] = useState("");
   const [actions, setActions] = useState<ActionDraft[]>([]);
@@ -27,6 +28,7 @@ export default function CreateAutomationPage() {
     try {
       const saved = JSON.parse(sessionStorage.getItem("actionhub.workflowDraft") ?? "null");
       if (saved) {
+        setName(typeof saved.name === "string" ? saved.name : "");
         setTrigger(saved.trigger);
         setSchedule(saved.schedule);
         setActions(saved.actions);
@@ -44,6 +46,7 @@ export default function CreateAutomationPage() {
       sessionStorage.setItem(
         "actionhub.workflowDraft",
         JSON.stringify({
+          name,
           trigger,
           schedule,
           actions,
@@ -56,6 +59,7 @@ export default function CreateAutomationPage() {
     }
   }, [
     draftReady,
+    name,
     trigger,
     schedule,
     actions,
@@ -82,6 +86,7 @@ export default function CreateAutomationPage() {
         `${BACKEND_URL}/api/v1/zap`,
         {
           availableTriggerId: trigger,
+          ...(name.trim() ? { name: name.trim() } : {}),
           actions: actionPayload(actions),
           ...(trigger === "schedule" ? { schedule } : {}),
           ...(trigger === "tally.form_submitted" ? { tally } : {}),
@@ -105,6 +110,15 @@ export default function CreateAutomationPage() {
   return (
     <WorkflowCanvas
       title="Create automation"
+      workflowNameField={
+        <Input
+          label="Workflow name (optional)"
+          maxLength={80}
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="Contact form notifications"
+        />
+      }
       trigger={trigger}
       actions={actions}
       onTriggerChange={setTrigger}

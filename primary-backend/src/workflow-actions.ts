@@ -89,7 +89,12 @@ export function createWorkflowActionHandlers(
         const zapId = await db.$transaction(async (tx) => {
           await checkConnections(tx, parsed.data.actions, userId);
           const zap = await tx.zap.create({
-            data: { userId, actions: { create: parsed.data.actions.map(actionData) } },
+            data: {
+              userId,
+              name: parsed.data.name ?? null,
+              createdAt: new Date(),
+              actions: { create: parsed.data.actions.map(actionData) },
+            },
           });
           const trigger = await tx.trigger.create({
             data: { ZapId: zap.id, triggerId: parsed.data.availableTriggerId },

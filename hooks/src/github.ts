@@ -148,6 +148,7 @@ export function createGitHubHandler(db: Database, encryptionKey?: string) {
               actionRuns: {
                 create: current.workflow.actions.map((action) => ({
                   actionId: action.id,
+                  sequence: action.sortingOrder,
                   type: action.actionId,
                   config: action.Metadata ?? {},
                   credentialId: action.credentialId ?? null,

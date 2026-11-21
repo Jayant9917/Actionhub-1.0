@@ -21,6 +21,9 @@ model User {
 }
 
 model Zap {
+  name String?
+  createdAt DateTime?
+  webhookEnabled Boolean @default(true)
   scheduleTrigger ScheduleTrigger?
   deletedAt DateTime?
   tallyTrigger TallyTrigger?
@@ -95,6 +98,8 @@ model ZapRunOutbox {
 
 // One immutable action snapshot per workflow run. Retries reuse this same record.
 model ActionRun {
+  sequence Int?
+
   credentialId String?
   credential Credential? @relation(fields: [credentialId], references: [id], onDelete: Restrict)
   id             String   @id @default(uuid())
@@ -113,6 +118,7 @@ model ActionRun {
   updatedAt      DateTime @updatedAt
   zapRun         ZapRun   @relation(fields: [zapRunId], references: [id], onDelete: Cascade)
 
+  @@index([zapRunId, sequence])
   @@unique([zapRunId, actionId])
   @@index([status, nextAttemptAt, dispatchAfter])
   @@index([status, leaseUntil])

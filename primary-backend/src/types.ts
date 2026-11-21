@@ -16,6 +16,7 @@ export const SigninSchema = z.object({
 });
 
 export const ZapCreateSchema = z.object({
+  name: z.string().trim().min(1).max(80).optional(),
   availableTriggerId: z.enum([
     "webhook",
     "schedule",

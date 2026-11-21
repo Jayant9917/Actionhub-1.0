@@ -22,6 +22,7 @@ export function createExecutionHistoryHandler(db: Pick<PrismaClient, "zap" | "za
         id: true,
         createdAt: true,
         actionRuns: {
+          orderBy: [{ sequence: "asc" }, { createdAt: "asc" }, { id: "asc" }],
           select: {
             id: true,
             actionId: true,
