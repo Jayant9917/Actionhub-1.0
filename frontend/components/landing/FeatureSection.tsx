@@ -115,7 +115,9 @@ export function FeatureSection() {
                 key={title}
                 className="rounded-2xl border border-neutral-200 bg-white p-8 text-left transition-all duration-fast hover:border-neutral-300 hover:shadow-soft"
               >
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${iconColors}`}>
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-xl ${iconColors}`}
+                >
                   <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="mt-6 text-title-sm text-neutral-900">{title}</h3>

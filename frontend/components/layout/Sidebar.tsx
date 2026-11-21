@@ -148,7 +148,13 @@ export function Sidebar({
               aria-label="ActionHub dashboard"
               className="flex size-10 items-center justify-center rounded-xl"
             >
-              <Image src="/icon.png" alt="" width={40} height={40} className="size-10 rounded-xl object-contain" />
+              <Image
+                src="/icon.png"
+                alt=""
+                width={40}
+                height={40}
+                className="size-10 rounded-xl object-contain"
+              />
             </Link>
           )}
         </div>

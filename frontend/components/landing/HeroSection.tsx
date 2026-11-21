@@ -22,16 +22,25 @@ export function HeroSection() {
             <span className="text-neutral-500 dark:text-neutral-400">Let them do it.</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-neutral-600 dark:text-neutral-400 md:text-lg">
-            Turn repetitive tasks into reliable workflows. Connect the tools you already use and get back to the work that moves you forward.
+            Turn repetitive tasks into reliable workflows. Connect the tools you already use and get
+            back to the work that moves you forward.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button variant="primary" size="lg" onClick={() => router.push("/signup")} className="rounded-lg shadow-none transition-opacity hover:opacity-85" style={{ backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }}>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => router.push("/signup")}
+              className="rounded-lg shadow-none transition-opacity hover:opacity-85"
+              style={{ backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }}
+            >
               Start for free <ArrowRight size={16} aria-hidden="true" />
             </Button>
             <Button
               variant="secondary"
               size="lg"
-              onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() =>
+                document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })
+              }
               className="rounded-lg border-neutral-300 bg-transparent dark:border-neutral-700 dark:bg-transparent dark:text-neutral-900 dark:hover:bg-neutral-900"
             >
               How it works <ArrowDown size={15} aria-hidden="true" />
@@ -44,7 +53,9 @@ export function HeroSection() {
         </div>
 
         <div className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-neutral-200 pt-6 text-xs text-neutral-500 dark:border-neutral-800 dark:text-neutral-400 md:mt-12">
-          <span className="font-medium text-neutral-600 dark:text-neutral-600">Built for the way your team works</span>
+          <span className="font-medium text-neutral-600 dark:text-neutral-600">
+            Built for the way your team works
+          </span>
           <span>50+ integrations</span>
           <span>Setup in minutes</span>
           <span>No code required</span>

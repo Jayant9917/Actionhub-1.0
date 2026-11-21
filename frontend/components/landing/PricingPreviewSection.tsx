@@ -9,7 +9,10 @@ export function PricingPreviewSection() {
 
   return (
     <FadeInSection>
-      <section id="pricing" className="section-padding scroll-mt-20 bg-neutral-50/50 dark:bg-[#121212]">
+      <section
+        id="pricing"
+        className="section-padding scroll-mt-20 bg-neutral-50/50 dark:bg-[#121212]"
+      >
         <div className="container-content text-center">
           <h2 className="section-heading">Simple, transparent pricing</h2>
           <p className="section-subtext">Start free. Scale when you’re ready. No surprise fees.</p>

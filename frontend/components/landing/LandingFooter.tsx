@@ -59,14 +59,21 @@ export function LandingFooter() {
           aria-labelledby="footer-team-note-heading"
           className="mt-12 w-full max-w-none rounded-2xl border border-neutral-200 bg-neutral-50/30 p-5 text-center shadow-soft sm:p-6"
         >
-          <h2 id="footer-team-note-heading" className="text-body-sm font-semibold text-neutral-950 dark:text-neutral-900">
+          <h2
+            id="footer-team-note-heading"
+            className="text-body-sm font-semibold text-neutral-950 dark:text-neutral-900"
+          >
             A note from the team
           </h2>
           <p className="mt-3 text-body-sm leading-6 text-neutral-600">
-            {"A form comes in. A spreadsheet row gets added. Discord gets the update. And you? You didn’t have to copy and paste a thing."}
+            {
+              "A form comes in. A spreadsheet row gets added. Discord gets the update. And you? You didn’t have to copy and paste a thing."
+            }
           </p>
           <p className="mt-4 text-body-sm leading-6 text-neutral-600">
-            {"That’s why we built ActionHub. Give the repeat stuff a workflow and get back to the work you actually want to do."}
+            {
+              "That’s why we built ActionHub. Give the repeat stuff a workflow and get back to the work you actually want to do."
+            }
           </p>
           <p className="mt-4 text-body-sm font-medium text-neutral-900">The ActionHub team ⚡</p>
         </section>

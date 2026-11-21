@@ -23,13 +23,11 @@ const FAQS = [
   },
   {
     question: "Can I edit a workflow after I create it?",
-    answer:
-      "Yes. Reopen a workflow in the visual editor to update, reorder, or remove its steps.",
+    answer: "Yes. Reopen a workflow in the visual editor to update, reorder, or remove its steps.",
   },
   {
     question: "Do I need to deploy anything?",
-    answer:
-      "No manual deployment or engineering handoff is needed to get an automation started.",
+    answer: "No manual deployment or engineering handoff is needed to get an automation started.",
   },
 ];
 

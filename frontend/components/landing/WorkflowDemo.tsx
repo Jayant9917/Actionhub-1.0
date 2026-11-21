@@ -23,9 +23,30 @@ const workflows = [
     id: "github-opened",
     name: "GitHub issue opened → Sheets + Discord",
     steps: [
-      { app: "GitHub", kind: "TRIGGER", title: "Issue opened", detail: "actionhub/web · #284", Icon: GitBranch, tone: "slate" },
-      { app: "Google Sheets", kind: "ACTION", title: "Add a spreadsheet row", detail: "Issue tracker · Row 284", Icon: FileSpreadsheet, tone: "green" },
-      { app: "Discord", kind: "ACTION", title: "Send a channel message", detail: "#engineering · Sent", Icon: MessageCircle, tone: "indigo" },
+      {
+        app: "GitHub",
+        kind: "TRIGGER",
+        title: "Issue opened",
+        detail: "actionhub/web · #284",
+        Icon: GitBranch,
+        tone: "slate",
+      },
+      {
+        app: "Google Sheets",
+        kind: "ACTION",
+        title: "Add a spreadsheet row",
+        detail: "Issue tracker · Row 284",
+        Icon: FileSpreadsheet,
+        tone: "green",
+      },
+      {
+        app: "Discord",
+        kind: "ACTION",
+        title: "Send a channel message",
+        detail: "#engineering · Sent",
+        Icon: MessageCircle,
+        tone: "indigo",
+      },
     ],
     result: "New issue logged in your tracker and shared with the team.",
     sample: "Keyboard shortcut stops working after refresh",
@@ -34,8 +55,22 @@ const workflows = [
     id: "github-assigned",
     name: "GitHub issue assigned → Slack",
     steps: [
-      { app: "GitHub", kind: "TRIGGER", title: "Issue assigned", detail: "actionhub/web · #284 → @priya", Icon: GitBranch, tone: "slate" },
-      { app: "Slack", kind: "ACTION", title: "Post to a channel", detail: "#engineering · Sent", Icon: SlackMark, tone: "rose" },
+      {
+        app: "GitHub",
+        kind: "TRIGGER",
+        title: "Issue assigned",
+        detail: "actionhub/web · #284 → @priya",
+        Icon: GitBranch,
+        tone: "slate",
+      },
+      {
+        app: "Slack",
+        kind: "ACTION",
+        title: "Post to a channel",
+        detail: "#engineering · Sent",
+        Icon: SlackMark,
+        tone: "rose",
+      },
     ],
     result: "The assigned issue is on your team’s radar.",
     sample: "Issue #284 assigned to Priya",
@@ -44,8 +79,22 @@ const workflows = [
     id: "schedule",
     name: "Schedule → Email",
     steps: [
-      { app: "Schedule", kind: "TRIGGER", title: "Every weekday at 9 AM", detail: "America / Los Angeles", Icon: CalendarDays, tone: "amber" },
-      { app: "Email", kind: "ACTION", title: "Send a daily summary", detail: "team@actionhub.dev · Sent", Icon: Mail, tone: "blue" },
+      {
+        app: "Schedule",
+        kind: "TRIGGER",
+        title: "Every weekday at 9 AM",
+        detail: "America / Los Angeles",
+        Icon: CalendarDays,
+        tone: "amber",
+      },
+      {
+        app: "Email",
+        kind: "ACTION",
+        title: "Send a daily summary",
+        detail: "team@actionhub.dev · Sent",
+        Icon: Mail,
+        tone: "blue",
+      },
     ],
     result: "Your daily team digest is ready to go.",
     sample: "3 projects updated · 5 tasks due today",
@@ -63,7 +112,14 @@ const toneStyles = {
 };
 
 function SlackMark({ className }: { className?: string }) {
-  return <span className={`flex items-center justify-center rounded-md bg-rose-600 font-bold text-white ${className ?? ""}`} aria-hidden="true">S</span>;
+  return (
+    <span
+      className={`flex items-center justify-center rounded-md bg-rose-600 font-bold text-white ${className ?? ""}`}
+      aria-hidden="true"
+    >
+      S
+    </span>
+  );
 }
 
 export function WorkflowDemo() {
@@ -106,20 +162,39 @@ export function WorkflowDemo() {
       <div className="flex flex-col gap-4 border-b border-neutral-200 px-4 py-4 dark:border-neutral-300 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
           <div className="flex items-center gap-2 text-sm font-semibold text-neutral-900 dark:text-neutral-900">
-            <span className="flex size-7 items-center justify-center rounded-lg" style={{ backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }}><Zap size={15} aria-hidden="true" /></span>
+            <span
+              className="flex size-7 items-center justify-center rounded-lg"
+              style={{ backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }}
+            >
+              <Zap size={15} aria-hidden="true" />
+            </span>
             Workflow playground
-            <span className="inline-flex shrink-0 whitespace-nowrap rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-medium leading-none uppercase tracking-wide text-neutral-500 dark:bg-neutral-100 dark:text-neutral-900">Sample data</span>
+            <span className="inline-flex shrink-0 whitespace-nowrap rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-medium leading-none uppercase tracking-wide text-neutral-500 dark:bg-neutral-100 dark:text-neutral-900">
+              Sample data
+            </span>
           </div>
-          <p className="mt-1 pl-9 text-xs text-neutral-500">Choose a flow and watch ActionHub do the busywork.</p>
+          <p className="mt-1 pl-9 text-xs text-neutral-500">
+            Choose a flow and watch ActionHub do the busywork.
+          </p>
         </div>
         <div className="flex items-center gap-2 self-start rounded-full border border-neutral-200 px-3 py-1.5 text-xs text-neutral-500 dark:border-neutral-300 sm:self-auto">
-          <span className={`size-1.5 rounded-full ${status === "running" ? "animate-pulse bg-amber-500" : status === "complete" ? "bg-emerald-500" : "bg-neutral-400"}`} />
-          {status === "running" ? "Running demo" : status === "complete" ? "Demo complete" : "Ready to run"}
+          <span
+            className={`size-1.5 rounded-full ${status === "running" ? "animate-pulse bg-amber-500" : status === "complete" ? "bg-emerald-500" : "bg-neutral-400"}`}
+          />
+          {status === "running"
+            ? "Running demo"
+            : status === "complete"
+              ? "Demo complete"
+              : "Ready to run"}
         </div>
       </div>
 
       <div className="p-4 sm:p-6">
-        <div role="group" aria-label="Choose a sample workflow" className="mb-7 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <div
+          role="group"
+          aria-label="Choose a sample workflow"
+          className="mb-7 grid grid-cols-1 gap-2 sm:grid-cols-3"
+        >
           {workflows.map((item, index) => (
             <button
               key={item.id}
@@ -130,19 +205,29 @@ export function WorkflowDemo() {
               onKeyDown={(event) => {
                 if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
                 event.preventDefault();
-                const next = (index + (event.key === "ArrowRight" ? 1 : workflows.length - 1)) % workflows.length;
+                const next =
+                  (index + (event.key === "ArrowRight" ? 1 : workflows.length - 1)) %
+                  workflows.length;
                 selectWorkflow(workflows[next].id);
                 (event.currentTarget.parentElement?.children[next] as HTMLButtonElement)?.focus();
               }}
               className={`rounded-xl border px-3 py-2.5 text-left text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 dark:focus-visible:ring-white ${selectedId === item.id ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-neutral-950" : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400 dark:border-neutral-300 dark:bg-neutral-950 dark:text-neutral-600 dark:hover:border-neutral-600"}`}
-              style={selectedId === item.id ? { backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" } : undefined}
+              style={
+                selectedId === item.id
+                  ? { backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }
+                  : undefined
+              }
             >
-              <span className="mr-2 text-[10px] opacity-60">0{index + 1}</span>{item.name}
+              <span className="mr-2 text-[10px] opacity-60">0{index + 1}</span>
+              {item.name}
             </button>
           ))}
         </div>
 
-        <div className="flex flex-col items-stretch gap-2 md:flex-row md:items-center md:gap-3" aria-label="Workflow steps">
+        <div
+          className="flex flex-col items-stretch gap-2 md:flex-row md:items-center md:gap-3"
+          aria-label="Workflow steps"
+        >
           {workflow.steps.map(({ app, kind, title, detail, Icon, tone }, index) => {
             const isActive = activeStep === index;
             const isDone = status === "complete" || activeStep > index;
@@ -151,31 +236,78 @@ export function WorkflowDemo() {
                 <motion.div
                   aria-current={isActive ? "step" : undefined}
                   animate={{
-                    borderColor: isActive ? "rgb(var(--color-text) / 0.55)" : isDone ? "rgba(16,185,129,0.5)" : "rgb(var(--color-border))",
+                    borderColor: isActive
+                      ? "rgb(var(--color-text) / 0.55)"
+                      : isDone
+                        ? "rgba(16,185,129,0.5)"
+                        : "rgb(var(--color-border))",
                     backgroundColor: isActive ? "rgb(var(--color-bg-muted))" : "transparent",
                     y: isActive && !reduceMotion ? -2 : 0,
                   }}
                   transition={{ duration: reduceMotion ? 0 : 0.24 }}
                   className="flex min-w-0 flex-1 items-center gap-3 rounded-xl border p-3 dark:bg-neutral-900/70"
                 >
-                  <span className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${toneStyles[tone]}`}>
+                  <span
+                    className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${toneStyles[tone]}`}
+                  >
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[10px] font-semibold tracking-[0.12em] text-neutral-400">{kind} · {app}</span>
-                    <span className="mt-1 block min-w-0 whitespace-normal break-words text-sm font-semibold leading-5 text-neutral-900 dark:text-neutral-900">{title}</span>
-                    <span className="mt-0.5 block truncate text-xs text-neutral-500 dark:text-neutral-400">{detail}</span>
+                    <span className="block text-[10px] font-semibold tracking-[0.12em] text-neutral-400">
+                      {kind} · {app}
+                    </span>
+                    <span className="mt-1 block min-w-0 whitespace-normal break-words text-sm font-semibold leading-5 text-neutral-900 dark:text-neutral-900">
+                      {title}
+                    </span>
+                    <span className="mt-0.5 block truncate text-xs text-neutral-500 dark:text-neutral-400">
+                      {detail}
+                    </span>
                   </span>
                   <span className="flex size-5 shrink-0 items-center justify-center">
-                    {isDone ? <CircleCheck className="size-4 text-emerald-600 dark:text-emerald-400" aria-label="Completed" /> : isActive ? <span className="size-2 rounded-full bg-neutral-900 dark:bg-neutral-900" aria-label="Running" /> : null}
+                    {isDone ? (
+                      <CircleCheck
+                        className="size-4 text-emerald-600 dark:text-emerald-400"
+                        aria-label="Completed"
+                      />
+                    ) : isActive ? (
+                      <span
+                        className="size-2 rounded-full bg-neutral-900 dark:bg-neutral-900"
+                        aria-label="Running"
+                      />
+                    ) : null}
                   </span>
                 </motion.div>
                 {index < workflow.steps.length - 1 && (
-                  <div className="flex h-5 w-full shrink-0 items-center justify-center md:h-auto md:w-8" aria-hidden="true">
+                  <div
+                    className="flex h-5 w-full shrink-0 items-center justify-center md:h-auto md:w-8"
+                    aria-hidden="true"
+                  >
                     <motion.span
                       className="h-full w-0.5 origin-top rounded-full bg-neutral-300 dark:bg-neutral-700 md:h-0.5 md:w-full md:origin-left"
-                      animate={{ scaleY: activeStep > index || status === "complete" ? 1 : status === "running" && activeStep === index ? [0.35, 1] : 0.55, scaleX: activeStep > index || status === "complete" ? 1 : status === "running" && activeStep === index ? [0.35, 1] : 0.55, backgroundColor: activeStep > index || status === "complete" ? "#10b981" : "#a3a3a3" }}
-                      transition={{ duration: reduceMotion ? 0 : 0.55, repeat: status === "running" && activeStep === index && !reduceMotion ? Infinity : 0, repeatType: "reverse" }}
+                      animate={{
+                        scaleY:
+                          activeStep > index || status === "complete"
+                            ? 1
+                            : status === "running" && activeStep === index
+                              ? [0.35, 1]
+                              : 0.55,
+                        scaleX:
+                          activeStep > index || status === "complete"
+                            ? 1
+                            : status === "running" && activeStep === index
+                              ? [0.35, 1]
+                              : 0.55,
+                        backgroundColor:
+                          activeStep > index || status === "complete" ? "#10b981" : "#a3a3a3",
+                      }}
+                      transition={{
+                        duration: reduceMotion ? 0 : 0.55,
+                        repeat:
+                          status === "running" && activeStep === index && !reduceMotion
+                            ? Infinity
+                            : 0,
+                        repeatType: "reverse",
+                      }}
                     />
                   </div>
                 )}
@@ -188,19 +320,74 @@ export function WorkflowDemo() {
           <div className="min-h-11 flex-1" aria-live="polite" aria-atomic="true">
             <AnimatePresence mode="wait">
               {status === "complete" ? (
-                <motion.div key="result" initial={{ opacity: 0, y: reduceMotion ? 0 : 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.2 }} className="flex items-start gap-2.5">
-                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300"><Check size={14} aria-hidden="true" /></span>
-                  <span><span className="block text-sm font-semibold text-neutral-900 dark:text-neutral-900">{workflow.result}</span><span className="mt-0.5 block text-xs text-neutral-500 dark:text-neutral-400">{workflow.sample}</span></span>
+                <motion.div
+                  key="result"
+                  initial={{ opacity: 0, y: reduceMotion ? 0 : 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: reduceMotion ? 0 : 0.2 }}
+                  className="flex items-start gap-2.5"
+                >
+                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300">
+                    <Check size={14} aria-hidden="true" />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-neutral-900 dark:text-neutral-900">
+                      {workflow.result}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-neutral-500 dark:text-neutral-400">
+                      {workflow.sample}
+                    </span>
+                  </span>
                 </motion.div>
               ) : status === "running" ? (
-                <motion.p key="running" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2 text-sm text-neutral-500"><Clock3 size={15} aria-hidden="true" /> {activeStep >= 0 ? `Step ${activeStep + 1} of ${workflow.steps.length} is running…` : "Preparing your workflow…"}</motion.p>
+                <motion.p
+                  key="running"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-2 text-sm text-neutral-500"
+                >
+                  <Clock3 size={15} aria-hidden="true" />{" "}
+                  {activeStep >= 0
+                    ? `Step ${activeStep + 1} of ${workflow.steps.length} is running…`
+                    : "Preparing your workflow…"}
+                </motion.p>
               ) : (
-                <motion.p key="hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2 text-sm text-neutral-500"><Webhook size={15} className="text-neutral-700 dark:text-neutral-700" aria-hidden="true" /> Runs locally with sample data—no accounts connected.</motion.p>
+                <motion.p
+                  key="hint"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-2 text-sm text-neutral-500"
+                >
+                  <Webhook
+                    size={15}
+                    className="text-neutral-700 dark:text-neutral-700"
+                    aria-hidden="true"
+                  />{" "}
+                  Runs locally with sample data—no accounts connected.
+                </motion.p>
               )}
             </AnimatePresence>
           </div>
-          <Button variant="primary" size="sm" onClick={runDemo} disabled={status === "running"} className="self-center shrink-0 w-40 h-14 rounded-xl px-5 py-3 gap-2 font-semibold shadow-none transition-opacity hover:opacity-85 sm:self-auto" style={{ backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }}>
-            {status === "complete" ? <><RotateCcw size={15} aria-hidden="true" /> Replay</> : <><Play size={15} aria-hidden="true" /> Run demo</>}
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={runDemo}
+            disabled={status === "running"}
+            className="self-center shrink-0 w-40 h-14 rounded-xl px-5 py-3 gap-2 font-semibold shadow-none transition-opacity hover:opacity-85 sm:self-auto"
+            style={{ backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }}
+          >
+            {status === "complete" ? (
+              <>
+                <RotateCcw size={15} aria-hidden="true" /> Replay
+              </>
+            ) : (
+              <>
+                <Play size={15} aria-hidden="true" /> Run demo
+              </>
+            )}
           </Button>
         </div>
       </div>

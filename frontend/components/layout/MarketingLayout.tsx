@@ -53,10 +53,19 @@ export function MarketingLayout({ children }: { children: React.ReactNode }) {
             href="/"
             className="flex items-center gap-2 text-title font-semibold text-neutral-900 transition-opacity duration-fast hover:opacity-80"
           >
-            <Image src="/icon.png" alt="" width={28} height={28} className="size-7 rounded-md object-contain" />
+            <Image
+              src="/icon.png"
+              alt=""
+              width={28}
+              height={28}
+              className="size-7 rounded-md object-contain"
+            />
             ActionHub
           </Link>
-          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-3 lg:flex" aria-label="Primary navigation">
+          <nav
+            className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-3 lg:flex"
+            aria-label="Primary navigation"
+          >
             <Link
               href="/#how-it-works"
               className="rounded-md px-2 py-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
