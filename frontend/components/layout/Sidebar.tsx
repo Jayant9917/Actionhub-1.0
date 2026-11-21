@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -138,15 +139,22 @@ export function Sidebar({
         <div className="flex h-14 items-center border-b border-neutral-200 px-4">
           {!collapsed && (
             <Link href="/dashboard" className="text-title font-semibold text-neutral-900">
-              Automate
+              ActionHub
             </Link>
           )}
           {collapsed && (
             <Link
               href="/dashboard"
-              className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-600 text-white"
+              aria-label="ActionHub dashboard"
+              className="flex size-10 items-center justify-center rounded-xl"
             >
-              <ZapIcon className="w-5 h-5" />
+              <Image
+                src="/icon.png"
+                alt=""
+                width={40}
+                height={40}
+                className="size-10 rounded-xl object-contain"
+              />
             </Link>
           )}
         </div>

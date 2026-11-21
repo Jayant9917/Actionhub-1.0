@@ -11,10 +11,10 @@ export const Hero = () => {
     <section className="container-content pt-16 pb-12 md:pt-24 md:pb-16">
       <div className="mx-auto max-w-3xl text-center">
         <h1 className="text-display-lg text-neutral-900 md:text-4xl">
-          Automate as fast as you can type
+          Build workflows as fast as you can type
         </h1>
         <p className="mt-6 text-body text-neutral-600 leading-relaxed">
-          AI gives you automation superpowers. Pairing AI and Automate helps you turn ideas into
+          AI gives you automation superpowers. Pairing AI and ActionHub helps you turn ideas into
           workflows that work for you.
         </p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">

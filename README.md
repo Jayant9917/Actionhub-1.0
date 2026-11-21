@@ -332,11 +332,6 @@ This project is licensed under the ISC License.
 - [ ] User dashboard with Zap analytics
 - [ ] Multi-tenant support
 
-
-
 <!-- docker compose --env-file .env.docker up --build --watch
 Use the full command when developing and editing code. To start the existing images without watching or explicitly rebuilding, use:
 docker compose --env-file .env.docker up -d -->
-
-
-
