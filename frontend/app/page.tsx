@@ -5,7 +5,6 @@ import {
   ProblemSection,
   HowItWorksSection,
   FeatureSection,
-  BuilderPreviewSection,
   IntegrationsSection,
   TestimonialsSection,
   PricingPreviewSection,
@@ -22,7 +21,6 @@ export default function Home() {
         <ProblemSection />
         <HowItWorksSection />
         <FeatureSection />
-        <BuilderPreviewSection />
         <IntegrationsSection />
         <TestimonialsSection />
         <PricingPreviewSection />
