@@ -21,7 +21,7 @@ const APPS = [
 export function IntegrationsSection() {
   return (
     <FadeInSection>
-      <section className="section-padding border-t border-neutral-100 bg-neutral-50/50">
+      <section className="section-padding border-t border-neutral-100 bg-neutral-50/50 dark:border-transparent">
         <div className="container-content text-center">
           <h2 className="section-heading">Integrations that fit your stack</h2>
           <div className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
