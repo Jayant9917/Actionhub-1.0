@@ -199,7 +199,7 @@ export function WorkflowDemo() {
               )}
             </AnimatePresence>
           </div>
-          <Button variant="primary" size="md" onClick={runDemo} disabled={status === "running"} className="shrink-0 rounded-lg shadow-none transition-opacity hover:opacity-85" style={{ backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }}>
+          <Button variant="primary" size="sm" onClick={runDemo} disabled={status === "running"} className="self-center shrink-0 w-40 h-14 rounded-xl px-5 py-3 gap-2 font-semibold shadow-none transition-opacity hover:opacity-85 sm:self-auto" style={{ backgroundColor: "rgb(var(--color-text))", color: "rgb(var(--color-bg))" }}>
             {status === "complete" ? <><RotateCcw size={15} aria-hidden="true" /> Replay</> : <><Play size={15} aria-hidden="true" /> Run demo</>}
           </Button>
         </div>
