@@ -12,3 +12,9 @@ COPY . .
 RUN DATABASE_URL=postgresql://build:build@postgres:5432/build npm run generate
 # Default command when the container starts.
 CMD ["./node_modules/.bin/tsx", "src/index.ts"]
+
+FROM development AS production
+RUN DATABASE_URL=postgresql://build:build@postgres:5432/build npm run build
+ENV NODE_ENV=production
+USER node
+CMD ["node", "dist/index.js"]

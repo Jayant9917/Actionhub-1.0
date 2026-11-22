@@ -6,26 +6,23 @@ docs/
 /ARCHITECTURE.md
 /TESTING.md
 dist
+# Local environment values, including production secrets. Keep templates.
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.development
-.env.test
-.env.production
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
+!.env.*.example
+
+# Local credentials and database backups
+*.pem
+*.key
+*.ppk
+*.dump
 
 # Reproducible generated/build output
 **/src/generated/
 **/.next/
 **/tsconfig.tsbuildinfo
 **/next-env.d.ts
-
-.env.docker
 
 # Unit-test reports
 **/coverage/

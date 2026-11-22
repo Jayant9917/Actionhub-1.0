@@ -1,0 +1,240 @@
+name: actionhub-production
+
+x-logging: &logging
+  driver: local
+
+services:
+  postgres:
+    logging: *logging
+    restart: unless-stopped
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: actionhub
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_DB: actionhub
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U actionhub -d actionhub"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  kafka-volume-init:
+    logging: *logging
+    image: apache/kafka:3.9.1
+    user: "0:0"
+    entrypoint: [sh, -c, "chown 1000:1000 /kafka-data"]
+    volumes:
+      - kafka-data:/kafka-data
+
+  kafka:
+    logging: *logging
+    restart: unless-stopped
+    image: apache/kafka:3.9.1
+    depends_on:
+      kafka-volume-init:
+        condition: service_completed_successfully
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    volumes:
+      - kafka-data:/tmp/kraft-combined-logs
+    healthcheck:
+      test:
+        [
+          CMD-SHELL,
+          "/opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list >/dev/null 2>&1",
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 15s
+
+  kafka-init:
+    logging: *logging
+    image: apache/kafka:3.9.1
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_PARTITIONS: ${KAFKA_PARTITIONS:-1}
+      KAFKA_TOPIC: zap-events
+      KAFKA_BROKERS: kafka:9092
+    volumes:
+      - ./processor/scripts/init-kafka.sh:/opt/actionhub/init-kafka.sh:ro
+    entrypoint: [sh, /opt/actionhub/init-kafka.sh]
+
+  db-init:
+    logging: *logging
+    image: actionhub-db-init-prod
+    build:
+      context: ./primary-backend
+      target: development
+    environment:
+      DATABASE_URL: postgresql://actionhub:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/actionhub
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      [
+        sh,
+        -c,
+        "npx prisma migrate deploy --config prisma.config.ts && npm run migrate:passwords && npx tsx seed.ts",
+      ]
+
+  primary-backend:
+    logging: *logging
+    restart: unless-stopped
+    image: actionhub-primary-backend-prod
+    build:
+      context: ./primary-backend
+      target: production
+    init: true
+    environment:
+      DATABASE_URL: postgresql://actionhub:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/actionhub
+      PORT: 3000
+      APP_ENV: production
+      AUTH_LOGIN_WINDOW_MS: ${AUTH_LOGIN_WINDOW_MS:-900000}
+      AUTH_LOGIN_IP_LIMIT: ${AUTH_LOGIN_IP_LIMIT:-30}
+      AUTH_LOGIN_ACCOUNT_LIMIT: ${AUTH_LOGIN_ACCOUNT_LIMIT:-10}
+      AUTH_SIGNUP_WINDOW_MS: ${AUTH_SIGNUP_WINDOW_MS:-3600000}
+      AUTH_SIGNUP_IP_LIMIT: ${AUTH_SIGNUP_IP_LIMIT:-5}
+      JWT_PASSWORD: ${JWT_PASSWORD:?Set JWT_PASSWORD in .env.production}
+      CREDENTIAL_ENCRYPTION_KEY: ${CREDENTIAL_ENCRYPTION_KEY:?Set CREDENTIAL_ENCRYPTION_KEY in .env.production}
+      GITHUB_SECRETS: ${GITHUB_SECRETS:-}
+      GITHUB_SETUP_WORKFLOW_ID: ${GITHUB_SETUP_WORKFLOW_ID:-}
+      GOOGLE_OAUTH_PUBLIC_URL: ${GOOGLE_OAUTH_PUBLIC_URL:-}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          CMD,
+          node,
+          -e,
+          'fetch("http://127.0.0.1:3000/health").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))',
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  hooks:
+    logging: *logging
+    restart: unless-stopped
+    image: actionhub-hooks-prod
+    build:
+      context: ./hooks
+      target: production
+    init: true
+    environment:
+      DATABASE_URL: postgresql://actionhub:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/actionhub
+      PORT: 3002
+      CREDENTIAL_ENCRYPTION_KEY: ${CREDENTIAL_ENCRYPTION_KEY:?Set CREDENTIAL_ENCRYPTION_KEY in .env.production}
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          CMD,
+          node,
+          -e,
+          'fetch("http://127.0.0.1:3002/health").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))',
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  processor:
+    logging: *logging
+    scale: ${PROCESSOR_REPLICAS:-1}
+    restart: unless-stopped
+    image: actionhub-processor-prod
+    build:
+      context: ./processor
+      target: production
+    init: true
+    environment:
+      DATABASE_URL: postgresql://actionhub:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/actionhub
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_TOPIC: zap-events
+      PROCESSOR_BATCH_SIZE: ${PROCESSOR_BATCH_SIZE:-50}
+      PROCESSOR_POLL_INTERVAL_MS: ${PROCESSOR_POLL_INTERVAL_MS:-2000}
+      SCHEDULER_BATCH_SIZE: ${SCHEDULER_BATCH_SIZE:-50}
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+      kafka-init:
+        condition: service_completed_successfully
+
+  worker:
+    logging: *logging
+    scale: ${WORKER_REPLICAS:-1}
+    restart: unless-stopped
+    image: actionhub-worker-prod
+    build:
+      context: ./worker
+      target: production
+    init: true
+    environment:
+      CREDENTIAL_ENCRYPTION_KEY: ${CREDENTIAL_ENCRYPTION_KEY:?Set CREDENTIAL_ENCRYPTION_KEY in .env.production}
+      DATABASE_URL: postgresql://actionhub:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@postgres:5432/actionhub
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_TOPIC: zap-events
+      KAFKA_GROUP_ID: main-worker
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-1}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
+      SMTP_ENDPOINT: ${SMTP_ENDPOINT:-smtp.resend.com}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_AUTH: "true"
+      SMTP_REQUIRE_TLS: "true"
+      SMTP_USERNAME: ${SMTP_USERNAME:-resend}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:?Set SMTP_PASSWORD in .env.production}
+      SMTP_FROM: ${SMTP_FROM:?Set SMTP_FROM in .env.production}
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+      kafka-init:
+        condition: service_completed_successfully
+
+  gateway:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      ACTIONHUB_API_HOST: ${ACTIONHUB_API_HOST:?Set ACTIONHUB_API_HOST}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      primary-backend:
+        condition: service_healthy
+      hooks:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+  kafka-data:
+  caddy-data:
+  caddy-config:

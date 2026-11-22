@@ -2,7 +2,7 @@
 import { toast, useToastFeedback } from "@/components/ui/toast";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import { BACKEND_URL } from "@/app/config";
+import { BACKEND_URL, HOOKS_URL } from "@/app/config";
 import { apiOptions, apiMessage, actionPayload } from "@/lib/actions";
 import type { ActionDraft } from "@/lib/actions";
 import { ScheduleSetup } from "./ScheduleSetup";
@@ -73,7 +73,7 @@ export function WorkflowActionsPanel({
     }
   }, [workflowId]);
   useEffect(() => {
-    setOrigin(window.location.origin);
+    setOrigin(HOOKS_URL || window.location.origin);
     void load();
   }, [load]);
   async function save() {

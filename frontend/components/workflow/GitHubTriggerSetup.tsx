@@ -3,7 +3,7 @@ import { useToastFeedback } from "@/components/ui/toast";
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BACKEND_URL } from "@/app/config";
+import { BACKEND_URL, HOOKS_URL } from "@/app/config";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -47,7 +47,9 @@ export function GitHubTriggerSetup({
   useEffect(() => {
     let active = true;
     setPublicBase(
-      localStorage.getItem(`actionhub.githubPublicBase.${workflowId}`) || window.location.origin,
+      localStorage.getItem(`actionhub.githubPublicBase.${workflowId}`) ||
+        HOOKS_URL ||
+        window.location.origin,
     );
     setConnection(null);
     setError("");

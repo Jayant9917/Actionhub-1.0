@@ -1,0 +1,21 @@
+{$ACTIONHUB_API_HOST} {
+	@api path /api/*
+	handle @api {
+		request_body {
+			max_size 1MB
+		}
+		reverse_proxy primary-backend:3000
+	}
+
+	@hooks path /hooks/*
+	handle @hooks {
+		request_body {
+			max_size 1MB
+		}
+		reverse_proxy hooks:3002
+	}
+
+	handle {
+		respond 404
+	}
+}

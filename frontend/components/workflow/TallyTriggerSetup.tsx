@@ -2,7 +2,7 @@
 import { useToastFeedback } from "@/components/ui/toast";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BACKEND_URL } from "@/app/config";
+import { BACKEND_URL, HOOKS_URL } from "@/app/config";
 import { apiOptions, apiMessage } from "@/lib/actions";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -70,7 +70,7 @@ export function TallyTriggerSetup({ workflowId }: { workflowId: string }) {
   useEffect(() => {
     let active = true;
     const key = `actionhub.tallyPublicBase.${workflowId}`;
-    setOrigin(localStorage.getItem(key) || window.location.origin);
+    setOrigin(localStorage.getItem(key) || HOOKS_URL || window.location.origin);
     axios
       .get(url, apiOptions())
       .then(({ data }) => {

@@ -1,0 +1,37 @@
+name: Production Compose smoke test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ACTIONHUB_API_HOST: http://localhost
+      POSTGRES_PASSWORD: disposable-smoke-database
+      JWT_PASSWORD: disposable-smoke-jwt
+      CREDENTIAL_ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+      SMTP_ENDPOINT: localhost
+      SMTP_PASSWORD: disposable-smoke-smtp
+      SMTP_FROM: smoke@example.com
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start the deployment stack
+        run: docker compose -f compose.production.yaml up -d --build
+      - name: Verify event execution through the gateway
+        run: node deploy/smoke.mjs
+      - name: Show stack diagnostics
+        if: failure()
+        run: |
+          docker compose -f compose.production.yaml ps -a
+          docker compose -f compose.production.yaml logs --tail=100
+      - name: Remove disposable stack
+        if: always()
+        run: docker compose -f compose.production.yaml down --volumes

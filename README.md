@@ -32,11 +32,11 @@ Small integrations often start as scripts that tie together webhooks, credential
 
 **Landing page**
 
-![ActionHub landing page](./1.png)
+![ActionHub landing page](./assets/screenshots/1.png)
 
 **Workflow playground**
 
-![Sample GitHub issue workflow with Google Sheets and Discord actions](./2.png)
+![Sample GitHub issue workflow with Google Sheets and Discord actions](./assets/screenshots/2.png)
 
 The playground on the landing page uses sample data. Its scenarios include GitHub issue assignment, which is outside the implemented trigger catalog.
 
@@ -216,6 +216,8 @@ Use [`.env.docker.example`](.env.docker.example) for Compose and the service-loc
 | Compose                       | `PGADMIN_PORT`, `PGADMIN_EMAIL`, `PGADMIN_PASSWORD`                                                                        | Optional local pgAdmin settings.                                                                                        |
 
 ## Docker Setup
+
+For the Vercel and EC2 deployment, follow the [EC2 deployment runbook](EC2_DEPLOYMENT_PLAN.md).
 
 The checked-in stack targets development. The gateway binds to loopback and routes `/api/` to the API, `/hooks/` to webhook ingestion, and other paths to Next.js. PostgreSQL and Kafka stay on the Compose network and persist data in named volumes. GitHub and Tally deliveries require a receiver reachable from those providers.
 
