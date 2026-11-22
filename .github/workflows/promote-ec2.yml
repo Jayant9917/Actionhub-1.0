@@ -1,0 +1,51 @@
+name: Promote EC2 release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: actionhub-ec2-promotion
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Verify CI and advance the production branch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          main_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
+          if [[ "$main_sha" != "$GITHUB_SHA" ]]; then
+            echo "Main changed since this promotion was requested. Run it again for the current commit." >&2
+            exit 1
+          fi
+
+          for workflow in ci.yml deployment-smoke.yml; do
+            result=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow "$workflow" \
+              --branch main --commit "$GITHUB_SHA" --event push --limit 1 \
+              --json conclusion --jq '.[0].conclusion // ""')
+            if [[ "$result" != success ]]; then
+              echo "$workflow has no successful latest push run for $GITHUB_SHA" >&2
+              exit 1
+            fi
+          done
+
+          existing=$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/heads/production" \
+            --jq '.[] | select(.ref == "refs/heads/production") | .object.sha')
+          if [[ -z "$existing" ]]; then
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+              -f ref=refs/heads/production -f sha="$GITHUB_SHA" --silent
+          else
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/heads/production" \
+              -f sha="$GITHUB_SHA" -F force=false --silent
+          fi
+          printf 'Promoted `%s` for EC2 deployment.\n' "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"

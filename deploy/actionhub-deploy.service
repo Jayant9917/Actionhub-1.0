@@ -1,0 +1,8 @@
+[Unit]
+Description=Deploy the approved ActionHub release
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/actionhub
+ExecStart=/usr/bin/bash %h/.local/bin/actionhub-pull-release
+TimeoutStartSec=20min
